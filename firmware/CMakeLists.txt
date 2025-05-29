@@ -8,4 +8,4 @@ file(GLOB_RECURSE headers CONFIGURE_DEPENDS
 )
 
 target_sources(microcyphal INTERFACE ${FTL_HEADERS})
-target_link_libraries(microcyphal INTERFACE ftl)
+target_link_libraries(microcyphal INTERFACE ftl ftl-native)
