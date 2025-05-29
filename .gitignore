@@ -1,2 +1,3 @@
 .direnv
 .pycache
+/scripts/package/.venv
