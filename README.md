@@ -14,6 +14,12 @@ A lightweight modular cyphal stack targeting deeply embedded systems
 # Debug
 `rip -d native-debug:hello-world`
 
+# Hello cyphal
+```
+cmake --workflow --preset native-debug && \
+rip -r native-debug:hello-world
+```
+
 # ctest
 ```
 cd /.bin/native-release/

@@ -8,7 +8,7 @@ namespace cyphal {
 
 
 // Cyphal data frame
-class Frame : private ftl::DataFrame {
+class UdpPayload : private ftl::DataFrame {
   public:
     // Offsets into the raw frame
     //
@@ -16,8 +16,8 @@ class Frame : private ftl::DataFrame {
     static constexpr std::size_t kPayloadOffset = 0;
   
     // Construct with payload size
-    explicit Frame(std::size_t size) : ftl::DataFrame(size) {}
-    Frame() = default;
+    explicit UdpPayload(std::size_t size) : ftl::DataFrame(size) {}
+    UdpPayload() = default;
   
     using ftl::DataFrame::size;
     using ftl::DataFrame::operator bool;
@@ -26,7 +26,7 @@ class Frame : private ftl::DataFrame {
     uint8_t* data() noexcept { return front() + kPayloadOffset; }
     const uint8_t* data() const noexcept { return front() + kPayloadOffset; }
   };
-  
-  static_assert(sizeof(Frame) == sizeof(ftl::DataFrame));
 
 }
+
+static_assert(sizeof(cyphal::UdpPayload) == sizeof(ftl::DataFrame));
