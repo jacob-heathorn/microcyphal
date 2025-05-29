@@ -1,0 +1,42 @@
+{
+  "python.defaultInterpreterPath": "./scripts/package/.venv/bin/python",
+  "[python]": {
+      "editor.defaultFormatter": "ms-python.autopep8",
+      "editor.formatOnSave": true,
+      "editor.tabSize": 2,
+      "editor.insertSpaces": true,
+      "editor.detectIndentation": false
+  },
+  "autopep8.args": [
+      "--max-line-length", "100",
+      "--indent-size", "2",
+      "--aggressive"
+  ],
+  "flake8.path": ["flake8"],
+  "flake8.args": [
+      "--indent-size", "2",
+      "--max-line-length", "100",
+  ],
+  "editor.tabSize": 2,
+  "editor.wordWrapColumn": 100,
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/.bin/native-debug/compile_commands.json",
+  "files.associations": {
+  },
+
+  "editor.tokenColorCustomizations": {
+      "textMateRules": [
+        {
+            "scope": "command-identifier.cmake",
+            "settings": {
+                "foreground": "#DCDCAA"
+            }
+        },
+        {
+            "scope": "expression.group.cmake",
+            "settings": {
+                "foreground": "#9CDCFE"
+            }
+        }
+      ]
+  },
+}
