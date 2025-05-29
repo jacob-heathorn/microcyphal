@@ -21,7 +21,10 @@
   "editor.wordWrapColumn": 100,
   "C_Cpp.default.compileCommands": "${workspaceFolder}/.bin/native-debug/compile_commands.json",
   "files.associations": {
-    "string_view": "cpp"
+    "string_view": "cpp",
+    "array": "cpp",
+    "initializer_list": "cpp",
+    "string": "cpp"
 },
 
   "editor.tokenColorCustomizations": {

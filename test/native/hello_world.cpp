@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "cyphal/udp_payload.hpp"
+#include "cyphal/udp_frame.hpp"
 
 int main() {
   std::cout << "Hello World!" << std::endl;
@@ -13,6 +13,8 @@ int main() {
   // Initialize data frame class with the memory allocator.
   ftl::DataFrame::initialize(allocator);
 
-  cyphal::UdpPayload p(2);
-  (void)p;
+  cyphal::UdpFrame f(2);
+  f.set_version(5);
+
+  std::cout << "version: " << (uint32_t)f.version() << std::endl;
 }
