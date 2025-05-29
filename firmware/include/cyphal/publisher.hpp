@@ -5,7 +5,7 @@
 #include <utility>  // std::move
 
 #include "cyphal/udp_frame.hpp"
-#include "ftl/ipv4/udp/UdpSocket.hpp"  // your UDP socket interface
+#include "ftl/ipv4/udp/socket.hpp"  // your UDP socket interface
 
 namespace cyphal {
 
@@ -17,7 +17,7 @@ public:
     /// @param source_node_id  Your node-ID (0…65534; 65535 = anonymous :contentReference[oaicite:0]{index=0}).
     /// @param priority        Cyphal priority 0 (highest) … 7 (lowest).
     UdpPublisher(uint16_t subject_id,
-              ftl::ipv4::udp::UdpSocket &socket,
+              ftl::ipv4::udp::SocketPtr socket,
               uint16_t source_node_id,
               uint8_t  priority = 0)
       : subject_id_(subject_id)
@@ -73,12 +73,12 @@ public:
         //    (see spec §4.3.2.1: group = 239.0.0.(subject-id), port = 938296) :contentReference[oaicite:5]{index=5}
         ftl::ipv4::Endpoint ep{/*address=*/make_multicast_address(subject_id_),
                                /*port   =*/938296};
-        socket_.send(std::move(frame), ep);
+        socket_->send(std::move(frame), ep);
     }
 
 private:
     uint16_t subject_id_;
-    ftl::ipv4::udp::UdpSocket &socket_;
+    ftl::ipv4::udp::SocketPtr socket_;
     uint16_t source_node_id_;
     uint8_t  priority_;
     uint64_t transfer_id_;

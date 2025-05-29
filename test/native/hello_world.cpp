@@ -1,6 +1,9 @@
 #include <iostream>
 
 #include "cyphal/udp_frame.hpp"
+#include "cyphal/publisher.hpp"
+
+#include <uavcan/node/Health_1_0.h>
 
 int main() {
   std::cout << "Hello World!" << std::endl;
@@ -16,4 +19,7 @@ int main() {
   cyphal::UdpFrame f(2);
 
   std::cout << "version: " << (uint32_t)f.version() << std::endl;
+
+  //
+  // cyphal::Publisher<uavcan_node_Health_1_0> publisher(2001);
 }
