@@ -14,7 +14,6 @@ int main() {
   ftl::DataFrame::initialize(allocator);
 
   cyphal::UdpFrame f(2);
-  f.set_version(5);
 
   std::cout << "version: " << (uint32_t)f.version() << std::endl;
 }
