@@ -11,11 +11,13 @@ namespace cyphal {
 class UdpFrame : public ftl::ipv4::udp::Payload {
   public:
     static constexpr std::size_t kHeaderSize = 24;
+    static constexpr std::size_t kTransferCrcSize = 4;
+
     static constexpr uint8_t kHeaderVersion = 1;
   
     // Constructs with payload data size
     explicit UdpFrame(std::size_t data_size) 
-      : ftl::ipv4::udp::Payload(kHeaderSize + data_size) {
+      : ftl::ipv4::udp::Payload(kHeaderSize + data_size + kTransferCrcSize) {
       set_version(kHeaderVersion);
     }
     
