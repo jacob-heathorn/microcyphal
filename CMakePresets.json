@@ -1,0 +1,14 @@
+{
+  "version": 7,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 23,
+    "patch": 0
+  },
+  "include": [
+    "$penv{FORGE_ROOT}/CMakePresets.json"
+  ],
+  "configurePresets": [],
+  "buildPresets": [],
+  "workflowPresets": []
+}

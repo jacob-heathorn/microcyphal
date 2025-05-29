@@ -1,3 +1,4 @@
-.direnv
-.pycache
+/.bin
+/.direnv
+/.pycache
 /scripts/package/.venv
