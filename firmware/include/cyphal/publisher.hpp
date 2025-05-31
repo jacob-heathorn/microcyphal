@@ -46,8 +46,9 @@ public:
         UdpFrame frame(kMaxLenBytes);
         // TODO need to access frame payload. Hide data()
 
-        // We will ask Nunavut to write bits into this array (byte‐aligned).
-        nunavut::support::bitspan buf{frame.data() + UdpFrame::kHeaderSize, frame.size() - UdpFrame::kHeaderSize};
+        (void)msg;
+        // // We will ask Nunavut to write bits into this array (byte‐aligned).
+        // nunavut::support::bitspan buf{frame.data() + UdpFrame::kHeaderSize, frame.size() - UdpFrame::kHeaderSize};
         // buf.reset();
         // The bit capacity is (kMaxLenBytes * 8) bits.
 
@@ -62,15 +63,15 @@ public:
         //    In general, for MessageT the generator emits:
         //      SerializeResult serialize(const MessageT &, bitspan);
         //
-        // TODO how to remove uavcan::node?
-        const nunavut::support::SerializeResult result = serialize(msg, buf);
-        if (result < 0)
-        {
-            throw std::runtime_error("Cyphal serialization failed"); // TODO
-        }
+
+        // const nunavut::support::SerializeResult result = serialize(msg, buf);
+        // if (result < 0)
+        // {
+        //     throw std::runtime_error("Cyphal serialization failed"); // TODO
+        // }
         // 'result' is the number of _bytes_ actually written (ceil(bit‐offset/8)).
-        const size_t payload_len = static_cast<size_t>(result);
-        assert(payload_len <=  kMaxLenBytes);
+        // const size_t payload_len = static_cast<size_t>(result);
+        // assert(payload_len <=  kMaxLenBytes);
 
         // 3) Fill in the Cyphal/UDP header (24 bytes) :contentReference[oaicite:1]{index=1}:
         frame.set_version    (UdpFrame::kHeaderVersion);      // uint4
