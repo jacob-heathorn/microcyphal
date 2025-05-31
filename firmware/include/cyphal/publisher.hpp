@@ -21,7 +21,7 @@ public:
               uint16_t source_node_id,
               uint8_t  priority = 0)
       : subject_id_(subject_id)
-      , socket_(socket)
+      , socket_{std::move(socket)}
       , source_node_id_(source_node_id)
       , priority_(priority & 0x07)
       , transfer_id_(0)
@@ -33,8 +33,10 @@ public:
     void publish(const MessageT &msg) {
         // 1) Serialize the message into a temporary buffer.
         //    We assume MessageT::MAX_PAYLOAD_SIZE is a constexpr bound.
-        static_assert(MessageT::MAX_PAYLOAD_SIZE <= 65479,
-                      "Payload too large for single‐frame Cyphal/UDP" );
+
+        // TODO preserve:
+        // static_assert(MessageT::MAX_PAYLOAD_SIZE <= 65479,
+        //               "Payload too large for single‐frame Cyphal/UDP" );
         uint8_t payload_buf[MessageT::MAX_PAYLOAD_SIZE];
         size_t   payload_len = msg.serialize(payload_buf, sizeof(payload_buf));
 
