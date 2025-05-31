@@ -1,5 +1,8 @@
 add_library(microcyphal INTERFACE) # TODO static?
-target_include_directories(microcyphal INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(microcyphal INTERFACE 
+  ${CMAKE_CURRENT_LIST_DIR}/include
+  ${CMAKE_CURRENT_LIST_DIR}/include/cpp14
+)
 # platformify(microcyphal)
 
 file(GLOB_RECURSE headers CONFIGURE_DEPENDS

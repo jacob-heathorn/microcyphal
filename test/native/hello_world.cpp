@@ -5,7 +5,7 @@
 #include "ftl/native_udp_socket.hpp"
 #include "ftl/native_ethernet_interface.hpp"
 
-#include <uavcan/node/Health_1_0.h>
+#include <uavcan/node/Health_1_0.hpp>
 
 // The port number is defined in the Cyphal/UDP Specification.
 static constexpr uint16_t kCyphalUdpPort = 9382U;
@@ -35,7 +35,7 @@ int main() {
   auto socket = lo.CreateUdpSocket();
   socket->open(4);
   socket->bind(kCyphalUdpPort);
-  cyphal::UdpPublisher<uavcan_node_Health_1_0> publisher(kSubjectId, std::move(socket), kSourceNodeId);
+  cyphal::UdpPublisher<uavcan::node::Health_1_0> publisher(kSubjectId, std::move(socket), kSourceNodeId);
 
   // uavcan_node_Health_1_0 msg{};
   // msg.value = 17;
