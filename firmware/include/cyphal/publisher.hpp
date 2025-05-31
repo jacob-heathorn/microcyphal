@@ -8,8 +8,6 @@
 #include "ftl/ipv4/udp/socket.hpp"  // your UDP socket interface
 #include "nunavut/support/serialization.hpp"
 
-#include <uavcan/node/Health_1_0.hpp>
-
 
 namespace cyphal {
 
@@ -65,7 +63,7 @@ public:
         //      SerializeResult serialize(const MessageT &, bitspan);
         //
         // TODO how to remove uavcan::node?
-        const nunavut::support::SerializeResult result = uavcan::node::serialize(msg, buf);
+        const nunavut::support::SerializeResult result = serialize(msg, buf);
         if (result < 0)
         {
             throw std::runtime_error("Cyphal serialization failed"); // TODO

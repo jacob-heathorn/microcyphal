@@ -45,36 +45,36 @@ int main() {
     return 1;
   }
 
-  Endpoint dst{Address{ 239, 0, 0, 42 }, kCyphalUdpPort};
+  // Endpoint dst{Address{ 239, 0, 0, 42 }, kCyphalUdpPort};
 
 
-  // cyphal::UdpPublisher<uavcan::node::Health_1_0> publisher(kSubjectId, std::move(socket), kSourceNodeId);
+  cyphal::UdpPublisher<uavcan::node::Health_1_0> publisher(kSubjectId, std::move(socket), kSourceNodeId);
 
-  // uavcan::node::Health_1_0 msg{};
-  // msg.value = 17;
+  uavcan::node::Health_1_0 msg{};
+  msg.value = 17;
 
   while (1)
   {
-    // publisher.publish(msg);
+    publisher.publish(msg);
 
-    // 1) Prepare the message
-    const char *msg = "hello_udp";
-    size_t      len = std::strlen(msg);
-    udp::Payload     p_send(len);
-    std::memcpy(p_send.data(), msg, len);
+    // // 1) Prepare the message
+    // const char *msg = "hello_udp";
+    // size_t      len = std::strlen(msg);
+    // udp::Payload     p_send(len);
+    // std::memcpy(p_send.data(), msg, len);
 
-    // 2) Send it
-    bool ok = socket->send(std::move(p_send), dst);
-    if (!ok) {
-        std::cerr 
-          << "[send] error, return=false, errno=" << errno 
-          << " (" << std::strerror(errno) << ")\n";
-    } else {
-        std::cout 
-          << "[send] sent " << len 
-          << " bytes → " << dst.address().ToString().c_str()
-          << ":" << dst.port() << "\n";
-    }
+    // // 2) Send it
+    // bool ok = socket->send(std::move(p_send), dst);
+    // if (!ok) {
+    //     std::cerr 
+    //       << "[send] error, return=false, errno=" << errno 
+    //       << " (" << std::strerror(errno) << ")\n";
+    // } else {
+    //     std::cout 
+    //       << "[send] sent " << len 
+    //       << " bytes → " << dst.address().ToString().c_str()
+    //       << ":" << dst.port() << "\n";
+    // }
     
     
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
