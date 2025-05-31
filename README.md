@@ -20,6 +20,9 @@ cmake --workflow --preset native-debug && \
 rip -r native-debug:hello-world
 ```
 
+subscribe in yakut: `y sub +M 2001:uavcan.node.Health`
+yakut monitor: `y mon`
+
 # ctest
 ```
 cd /.bin/native-release/

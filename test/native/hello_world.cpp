@@ -53,6 +53,7 @@ int main() {
   while (1)
   {
     publisher.publish(msg);
+    std::cout << "published health" << std::endl;
     
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
