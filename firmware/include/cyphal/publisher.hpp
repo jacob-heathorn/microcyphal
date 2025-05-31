@@ -33,17 +33,8 @@ public:
 
     /// Publish one message as a single‐frame Cyphal/UDP transfer.
     void publish(const MessageT &msg) {
-        //
-        // 1) Allocate a compile-time buffer whose size is exactly the DSDL‐defined 'ExtentBytes'.
-        //    This is the maximum‐possible serialized size of MessageT.
-        //
-        constexpr size_t kMaxLenBytes = MessageT::_traits_::ExtentBytes;
-        static_assert(kMaxLenBytes > 0,
-                      "Every C++‐generated message defines a nonzero ExtentBytes.");
-
-
-        // Create udp frame, with extent size.
-        UdpFrame frame(kMaxLenBytes);
+        // Create udp frame, with exact size.
+        UdpFrame frame(MessageT::_traits_::SerializationBufferSizeBytes);
         // TODO need to access frame payload. Hide data()
 
         (void)msg;
