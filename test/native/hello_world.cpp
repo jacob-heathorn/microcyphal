@@ -1,4 +1,6 @@
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include "cyphal/udp_frame.hpp"
 #include "cyphal/publisher.hpp"
@@ -33,12 +35,48 @@ int main() {
   // Setup interface on loopback interface.
   ftl::ethernet::NativeEthernetInterface lo{Address{"127.0.0.1"}, Mask{"255.255.255.0"}};
   auto socket = lo.CreateUdpSocket();
-  socket->open(4);
-  socket->bind(kCyphalUdpPort);
-  cyphal::UdpPublisher<uavcan::node::Health_1_0> publisher(kSubjectId, std::move(socket), kSourceNodeId);
+  if (!socket->open(4)) {
+    std::cerr << "Failed to open\n";
+    return 1;
+  }
+  
+  if (!socket->bind(kCyphalUdpPort)) {
+    std::cerr << "Failed to bind\n";
+    return 1;
+  }
 
-  // uavcan_node_Health_1_0 msg{};
+  Endpoint dst{Address{ 239, 0, 0, 42 }, kCyphalUdpPort};
+
+
+  // cyphal::UdpPublisher<uavcan::node::Health_1_0> publisher(kSubjectId, std::move(socket), kSourceNodeId);
+
+  // uavcan::node::Health_1_0 msg{};
   // msg.value = 17;
 
-  // publisher.publish(msg);
+  while (1)
+  {
+    // publisher.publish(msg);
+
+    // 1) Prepare the message
+    const char *msg = "hello_udp";
+    size_t      len = std::strlen(msg);
+    udp::Payload     p_send(len);
+    std::memcpy(p_send.data(), msg, len);
+
+    // 2) Send it
+    bool ok = socket->send(std::move(p_send), dst);
+    if (!ok) {
+        std::cerr 
+          << "[send] error, return=false, errno=" << errno 
+          << " (" << std::strerror(errno) << ")\n";
+    } else {
+        std::cout 
+          << "[send] sent " << len 
+          << " bytes → " << dst.address().ToString().c_str()
+          << ":" << dst.port() << "\n";
+    }
+    
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
 }

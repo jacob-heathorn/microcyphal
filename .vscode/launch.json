@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "name": "native-debug:hello-world",
+      "type": "cppdbg",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "program": "/home/jacob/embedded/nxp/microcyphal/.bin/native-debug/microcyphal/test/native/hello-world",
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb"
+    }
+  ]
+}

@@ -6,6 +6,10 @@
 
 #include "cyphal/udp_frame.hpp"
 #include "ftl/ipv4/udp/socket.hpp"  // your UDP socket interface
+#include "nunavut/support/serialization.hpp"
+
+#include <uavcan/node/Health_1_0.hpp>
+
 
 namespace cyphal {
 
@@ -31,17 +35,44 @@ public:
 
     /// Publish one message as a single‐frame Cyphal/UDP transfer.
     void publish(const MessageT &msg) {
-        // 1) Serialize the message into a temporary buffer.
-        //    We assume MessageT::MAX_PAYLOAD_SIZE is a constexpr bound.
+        //
+        // 1) Allocate a compile-time buffer whose size is exactly the DSDL‐defined 'ExtentBytes'.
+        //    This is the maximum‐possible serialized size of MessageT.
+        //
+        constexpr size_t kMaxLenBytes = MessageT::_traits_::ExtentBytes;
+        static_assert(kMaxLenBytes > 0,
+                      "Every C++‐generated message defines a nonzero ExtentBytes.");
 
-        // TODO preserve:
-        // static_assert(MessageT::MAX_PAYLOAD_SIZE <= 65479,
-        //               "Payload too large for single‐frame Cyphal/UDP" );
-        uint8_t payload_buf[MessageT::MAX_PAYLOAD_SIZE];
-        size_t   payload_len = msg.serialize(payload_buf, sizeof(payload_buf));
 
-        // 2) Allocate a Cyphal/UDP frame: header (24) + payload + CRC-32C (4).
-        UdpFrame frame(payload_len + /*CRC-32C*/ 4);
+        // Create udp frame, with extent size.
+        UdpFrame frame(kMaxLenBytes);
+        // TODO need to access frame payload. Hide data()
+
+        // We will ask Nunavut to write bits into this array (byte‐aligned).
+        nunavut::support::bitspan buf{frame.data() + UdpFrame::kHeaderSize, frame.size() - UdpFrame::kHeaderSize};
+        // buf.reset();
+        // The bit capacity is (kMaxLenBytes * 8) bits.
+
+        //
+        // 2) Invoke the generated free‐function serialize(...)
+        //    Signature (for Health_1_0) is:
+        //      nunavut::support::SerializeResult serialize(
+        //          const uavcan::node::Health_1_0 & obj,
+        //          nunavut::support::bitspan buffer_out
+        //      );
+        //
+        //    In general, for MessageT the generator emits:
+        //      SerializeResult serialize(const MessageT &, bitspan);
+        //
+        // TODO how to remove uavcan::node?
+        const nunavut::support::SerializeResult result = uavcan::node::serialize(msg, buf);
+        if (result < 0)
+        {
+            throw std::runtime_error("Cyphal serialization failed"); // TODO
+        }
+        // 'result' is the number of _bytes_ actually written (ceil(bit‐offset/8)).
+        const size_t payload_len = static_cast<size_t>(result);
+        assert(payload_len <=  kMaxLenBytes);
 
         // 3) Fill in the Cyphal/UDP header (24 bytes) :contentReference[oaicite:1]{index=1}:
         frame.set_version    (UdpFrame::kHeaderVersion);      // uint4
@@ -55,26 +86,23 @@ public:
         frame.set_end_of_transfer    (true);                  // EOT
         frame.set_user_data          (0);                     // application‐opaque
 
-        // 4) Copy the serialized payload right after the 24‐byte header
-        std::memcpy(frame.data() + UdpFrame::kHeaderSize,
-                    payload_buf, payload_len);
 
         // 5) Append the 4-byte CRC-32C (little-endian) of the payload :contentReference[oaicite:3]{index=3}
-        uint32_t crc32 = crc32c(payload_buf, payload_len);
-        auto *crc_ptr  = frame.data() + UdpFrame::kHeaderSize + payload_len;
-        crc_ptr[0] =  uint8_t( crc32        & 0xFF);
-        crc_ptr[1] =  uint8_t((crc32 >>  8) & 0xFF);
-        crc_ptr[2] =  uint8_t((crc32 >> 16) & 0xFF);
-        crc_ptr[3] =  uint8_t((crc32 >> 24) & 0xFF);
+        // uint32_t crc32 = crc32c(frame.data() + UdpFrame::kHeaderSize, payload_len);
+        // auto *crc_ptr  = frame.data() + UdpFrame::kHeaderSize + payload_len;
+        // crc_ptr[0] =  uint8_t( crc32        & 0xFF);
+        // crc_ptr[1] =  uint8_t((crc32 >>  8) & 0xFF);
+        // crc_ptr[2] =  uint8_t((crc32 >> 16) & 0xFF);
+        // crc_ptr[3] =  uint8_t((crc32 >> 24) & 0xFF);
 
         // 6) Compute and set the header CRC-16/CCITT-FALSE over bytes 0..21 (big-endian field) :contentReference[oaicite:4]{index=4}
-        uint16_t hdr_crc = crc16_ccitt_false_be(frame.data(), /*len=*/22);
-        frame.set_header_crc16(hdr_crc);
+        // uint16_t hdr_crc = crc16_ccitt_false_be(frame.data(), /*len=*/22);
+        // frame.set_header_crc16(hdr_crc);
 
         // 7) Send via UDP to the Cyphal IPv4 multicast group for this subject
         //    (see spec §4.3.2.1: group = 239.0.0.(subject-id), port = 938296) :contentReference[oaicite:5]{index=5}
-        ftl::ipv4::Endpoint ep{/*address=*/make_multicast_address(subject_id_),
-                               /*port   =*/938296};
+        // ftl::ipv4::Endpoint ep{ftl::ipv4::Address(make_multicast_address(subject_id_)), uint16_t(9382)};
+        ftl::ipv4::Endpoint ep{ftl::ipv4::Address("239.0.0.2"), uint16_t(9382)};
         socket_->send(std::move(frame), ep);
     }
 
@@ -91,9 +119,9 @@ private:
         return 0xEF000000u | uint32_t(subject_id);
     }
 
-    // Stub signatures for CRC functions—you’ll need real implementations:
-    static uint16_t crc16_ccitt_false_be(const void* data, size_t len);
-    static uint32_t crc32c(const void* data, size_t len);
+    // // Stub signatures for CRC functions—you’ll need real implementations:
+    // static uint16_t crc16_ccitt_false_be(const void* data, size_t len);
+    // static uint32_t crc32c(const void* data, size_t len);
 };
 
 }  // namespace cyphal
