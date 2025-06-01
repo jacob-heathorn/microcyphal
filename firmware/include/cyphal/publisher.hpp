@@ -206,10 +206,10 @@ public:
             transferCRCCompute(payload_actual_size, frame.payload()));
 
 
-        // 7) Send via UDP to the Cyphal IPv4 multicast group for this subject
-        //    (see spec §4.3.2.1: group = 239.0.0.(subject-id), port = 938296) :contentReference[oaicite:5]{index=5}
-        // ftl::ipv4::Endpoint ep{ftl::ipv4::Address(make_multicast_address(subject_id_)), uint16_t(9382)};
-        ftl::ipv4::Endpoint ep{ftl::ipv4::Address("239.0.0.2"), uint16_t(9382)};
+        // Send via UDP to the Cyphal IPv4 multicast group for this subject
+        //    (see spec §4.3.2.1: group = 239.0.0.(subject-id), port = 938296)
+        ftl::ipv4::Endpoint ep{ftl::ipv4::Address(make_multicast_address(subject_id_)), uint16_t(9382)};
+        //ftl::ipv4::Endpoint ep{ftl::ipv4::Address("239.0.0.2"), uint16_t(9382)};
         socket_->send(std::move(frame), ep);
     }
 
@@ -220,9 +220,11 @@ private:
     uint8_t  priority_;
     uint64_t transfer_id_;
 
-    // Helper to compute 239.0.0.<subject-id>:
+    // Helper to compute 239.0.(subject_id >> 8).(subject_id & 0xFF):
     static uint32_t make_multicast_address(uint16_t subject_id) {
-        // 239.0.0.X  in network‐order: 0xEF000000 | subject_id
+        // 0xEF000000 = 239.0.0.0 in big-endian.  
+        // OR’ing in subject_id places the high byte of subject_id into
+        // the third octet, and the low byte into the fourth octet.
         return 0xEF000000u | uint32_t(subject_id);
     }
 
