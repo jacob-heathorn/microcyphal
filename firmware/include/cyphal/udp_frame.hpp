@@ -41,10 +41,15 @@ namespace cyphal {
 //------------------------------------------------------------------------------
 
 class UdpFrame final : public ftl::ipv4::udp::Payload {
-public:
+
+private:
+    // Don't let users get confused by base class accessors.
+    using ftl::ipv4::udp::Payload::data;
+
     static constexpr std::size_t kHeaderSize      = 24;
     static constexpr std::size_t kTransferCrcSize = 4;
 
+public:
     static constexpr uint8_t kHeaderVersion = 1;
 
     // Constructs a UdpFrame with data_size bytes of application data.
@@ -139,6 +144,10 @@ public:
         return (static_cast<uint16_t>(data()[22]) << 8)
              | static_cast<uint16_t>(data()[23]);
     }
+
+    uint8_t* payload() noexcept { return data() + kHeaderSize; }
+    const uint8_t* payload() const noexcept { return data() + kHeaderSize; }
+    std::size_t payload_max_size() const noexcept { return size() - kHeaderSize - kTransferCrcSize; }
 
     //----------------------------------------------------------------------------
     // — Setters —

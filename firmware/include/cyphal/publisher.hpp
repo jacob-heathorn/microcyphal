@@ -35,34 +35,20 @@ public:
     void publish(const MessageT &msg) {
         // Create udp frame, with exact size.
         UdpFrame frame(MessageT::_traits_::SerializationBufferSizeBytes);
-        // TODO need to access frame payload. Hide data()
 
-        (void)msg;
-        // // We will ask Nunavut to write bits into this array (byte‐aligned).
-        // nunavut::support::bitspan buf{frame.data() + UdpFrame::kHeaderSize, frame.size() - UdpFrame::kHeaderSize};
-        // buf.reset();
-        // The bit capacity is (kMaxLenBytes * 8) bits.
 
-        //
-        // 2) Invoke the generated free‐function serialize(...)
-        //    Signature (for Health_1_0) is:
-        //      nunavut::support::SerializeResult serialize(
-        //          const uavcan::node::Health_1_0 & obj,
-        //          nunavut::support::bitspan buffer_out
-        //      );
-        //
-        //    In general, for MessageT the generator emits:
-        //      SerializeResult serialize(const MessageT &, bitspan);
-        //
+        // Serialize into the frame's payload with nanavut.
+        nunavut::support::bitspan payload_span{frame.payload(), frame.payload_max_size()};
 
-        // const nunavut::support::SerializeResult result = serialize(msg, buf);
-        // if (result < 0)
-        // {
-        //     throw std::runtime_error("Cyphal serialization failed"); // TODO
-        // }
-        // 'result' is the number of _bytes_ actually written (ceil(bit‐offset/8)).
-        // const size_t payload_len = static_cast<size_t>(result);
-        // assert(payload_len <=  kMaxLenBytes);
+        const nunavut::support::SerializeResult result = serialize(msg, payload_span);
+        if (result < 0)
+        {
+            throw std::runtime_error("Cyphal serialization failed"); // TODO
+        }
+        
+        // The number of bytes written should exactly match the payload max size, since a publisher
+        // is serializeing the exact message version.
+        assert(static_cast<size_t>(result) == frame.payload_max_size());
 
         // 3) Fill in the Cyphal/UDP header (24 bytes) :contentReference[oaicite:1]{index=1}:
         frame.set_version    (UdpFrame::kHeaderVersion);      // uint4
