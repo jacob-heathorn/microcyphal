@@ -66,6 +66,16 @@ static inline uint16_t headerCRCCompute(const size_t size, const void* const dat
     return out;
 }
 
+static inline byte_t* txSerializeU32(byte_t* const destination_buffer, const uint32_t value)
+{
+    byte_t* ptr = destination_buffer;
+    for (size_t i = 0; i < sizeof(value); i++)  // We sincerely hope that the compiler will use memcpy.
+    {
+        *ptr++ = (byte_t) ((byte_t) (value >> (i * ByteWidth)) & ByteMask);
+    }
+    return ptr;
+}
+
 // --------------------------------------------- TRANSFER CRC ---------------------------------------------
 
 #define TRANSFER_CRC_INITIAL 0xFFFFFFFFUL
@@ -191,17 +201,10 @@ public:
         *ptr++ = (uint8_t) ((uint8_t) (crc >> ByteWidth) & ByteMask);
         *ptr++ = (uint8_t) (crc & ByteMask);
 
-        // // Append the 4-byte CRC-32C (little-endian) of the payload.
-        // uint32_t crc32 = crc32c(frame.data() + UdpFrame::kHeaderSize, payload_len);
-        // auto *crc_ptr  = frame.data() + UdpFrame::kHeaderSize + payload_len;
-        // crc_ptr[0] =  uint8_t( crc32        & 0xFF);
-        // crc_ptr[1] =  uint8_t((crc32 >>  8) & 0xFF);
-        // crc_ptr[2] =  uint8_t((crc32 >> 16) & 0xFF);
-        // crc_ptr[3] =  uint8_t((crc32 >> 24) & 0xFF);
+        // Append the 4-byte CRC-32C (little-endian) of the payload.
+        txSerializeU32(frame.payload() + payload_actual_size, 
+            transferCRCCompute(payload_actual_size, frame.payload()));
 
-        // 6) Compute and set the header CRC-16/CCITT-FALSE over bytes 0..21 (big-endian field) :contentReference[oaicite:4]{index=4}
-        // uint16_t hdr_crc = crc16_ccitt_false_be(frame.data(), /*len=*/22);
-        // frame.set_header_crc16(hdr_crc);
 
         // 7) Send via UDP to the Cyphal IPv4 multicast group for this subject
         //    (see spec §4.3.2.1: group = 239.0.0.(subject-id), port = 938296) :contentReference[oaicite:5]{index=5}
