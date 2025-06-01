@@ -46,11 +46,10 @@ private:
     // Don't let users get confused by base class accessors.
     using ftl::ipv4::udp::Payload::data;
 
-    static constexpr std::size_t kHeaderSize      = 24;
-    static constexpr std::size_t kTransferCrcSize = 4;
-
 public:
     static constexpr uint8_t kHeaderVersion = 1;
+    static constexpr std::size_t kHeaderSize      = 24;
+    static constexpr std::size_t kTransferCrcSize = 4;
 
     // Constructs a UdpFrame with data_size bytes of application data.
     // Total Payload size = header (24) + data_size + transfer_crc (4).
@@ -144,6 +143,9 @@ public:
         return (static_cast<uint16_t>(data()[22]) << 8)
              | static_cast<uint16_t>(data()[23]);
     }
+
+    uint8_t* header() noexcept { return data(); }
+    const uint8_t* header() const noexcept { return data(); }
 
     uint8_t* payload() noexcept { return data() + kHeaderSize; }
     const uint8_t* payload() const noexcept { return data() + kHeaderSize; }
