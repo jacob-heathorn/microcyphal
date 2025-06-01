@@ -7,7 +7,7 @@
 #include "ftl/native_udp_socket.hpp"
 #include "ftl/native_ethernet_interface.hpp"
 
-#include <uavcan/node/Health_1_0.hpp>
+#include <uavcan/node/Heartbeat_1_0.hpp>
 
 // The port number is defined in the Cyphal/UDP Specification.
 static constexpr uint16_t kCyphalUdpPort = 9382U;
@@ -45,16 +45,20 @@ int main() {
     return 1;
   }
 
-  cyphal::UdpPublisher<uavcan::node::Health_1_0> publisher(kSubjectId, std::move(socket), kSourceNodeId);
+  // cyphal::UdpPublisher<uavcan::node::Health_1_0> publisher(kSubjectId, std::move(socket), kSourceNodeId);
+  cyphal::UdpPublisher<uavcan::node::Heartbeat_1_0> publisher(uavcan::node::Heartbeat_1_0::_traits_::FixedPortId,
+    std::move(socket), kSourceNodeId);
 
-  uavcan::node::Health_1_0 msg{};
-  msg.value = 17;
+  uavcan::node::Heartbeat_1_0 msg{};
+  msg.uptime = 0;
+  msg.health = uavcan::node::Health_1_0{uavcan::node::Health_1_0::NOMINAL};
 
   while (1)
   {
     publisher.publish(msg);
     std::cout << "published health" << std::endl;
     
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    ++msg.uptime;
   }
 }

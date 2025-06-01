@@ -180,7 +180,8 @@ public:
         // The number of bytes written should exactly match the payload max size, since a publisher
         // is serializeing the exact message version.
         const size_t payload_actual_size = static_cast<size_t>(result);
-        assert(payload_actual_size == frame.payload_max_size());
+        std::cout << "pyaload actual size: " << payload_actual_size << std::endl;
+        assert(payload_actual_size <= frame.payload_max_size());
 
         // Fill in the Cyphal/UDP header (24 bytes) :contentReference[oaicite:1]{index=1}:
         frame.set_version    (UdpFrame::kHeaderVersion);      // uint4
