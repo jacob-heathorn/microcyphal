@@ -51,7 +51,8 @@ int main() {
 
   uavcan::node::Heartbeat_1_0 msg{};
   msg.uptime = 0;
-  msg.health = uavcan::node::Health_1_0{uavcan::node::Health_1_0::NOMINAL};
+  msg.health.value = uavcan::node::Health_1_0::NOMINAL;
+  msg.vendor_specific_status_code = 2;
 
   while (1)
   {
@@ -59,6 +60,6 @@ int main() {
     std::cout << "published health" << std::endl;
     
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    ++msg.uptime;
+    msg.uptime += 1'000'000;
   }
 }
