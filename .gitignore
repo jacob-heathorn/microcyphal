@@ -3,3 +3,4 @@
 /.pycache
 /scripts/package/.venv
 /Testing
+/.claude
