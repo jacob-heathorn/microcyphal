@@ -7,7 +7,8 @@ add_platform_test(ut-cyphal
 target_link_libraries(ut-cyphal microcyphal)
 
 # Manual tests
-add_executable(hello-world hello_world.cpp)
-platformify(hello-world)
-target_link_libraries(hello-world microcyphal)
+# Commented out because hello_world uses C++ API which won't work with C version
+# add_executable(hello-world hello_world.cpp)
+# platformify(hello-world)
+# target_link_libraries(hello-world microcyphal)
 

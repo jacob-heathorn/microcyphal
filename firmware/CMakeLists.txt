@@ -1,7 +1,8 @@
 add_library(microcyphal INTERFACE) # TODO static?
 target_include_directories(microcyphal INTERFACE 
   ${CMAKE_CURRENT_LIST_DIR}/include
-  ${CMAKE_CURRENT_LIST_DIR}/include/cpp14
+  # ${CMAKE_CURRENT_LIST_DIR}/include/cpp14
+  ${CMAKE_CURRENT_LIST_DIR}/../.bin/generated/c
 )
 # platformify(microcyphal)
 
