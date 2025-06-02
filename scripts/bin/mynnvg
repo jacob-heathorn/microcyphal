@@ -5,7 +5,7 @@ set -e
 pushd $PROJECT_ROOT/scripts/package
 
 DSDL_PATH=~/.cyphal/uavcan
-OUT_PATH=$PROJECT_ROOT/.bin/generated/nunavut_out
+OUT_PATH=$PROJECT_ROOT/.bin/generated/
 
 echo "DSDL_PATH: $DSDL_PATH"
 echo "OUT_PATH: $OUT_PATH"
@@ -21,7 +21,7 @@ poetry run nnvg \
     --include-experimental-languages \
     --outdir "$OUT_PATH" \
     --lookup-dir "$DSDL_PATH" \
-    --jobs 1 \
+    --jobs 4 \
     --verbose \
     "$DSDL_PATH/node/7509.Heartbeat.1.0.dsdl"
 
