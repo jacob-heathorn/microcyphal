@@ -169,6 +169,7 @@ public:
 
 
         // Serialize into the frame's payload with nanavut.
+        // Use explicit cast to avoid constructor ambiguity in bitspan
         nunavut::support::bitspan payload_span{frame.payload(), frame.payload_max_size()};
 
         const nunavut::support::SerializeResult result = serialize(msg, payload_span);
@@ -177,10 +178,10 @@ public:
             throw std::runtime_error("Cyphal serialization failed"); // TODO
         }
         
-        // NOTE: Due to nunavut offset tracking bugs, result returns wrong byte count.
-        // For fixed-size Cyphal messages, we use the known constant size instead.
-        const size_t payload_actual_size = MessageT::_traits_::SerializationBufferSizeBytes;
-        assert(payload_actual_size <= frame.payload_max_size());
+        // Verify serialization returned the expected size
+        const size_t expected_size = MessageT::_traits_::SerializationBufferSizeBytes;
+        assert(static_cast<size_t>(result.value()) == expected_size && "Serialization size mismatch");
+        assert(expected_size == frame.payload_max_size());
 
         // Fill in the Cyphal/UDP header (24 bytes) :contentReference[oaicite:1]{index=1}:
         frame.set_version    (UdpFrame::kHeaderVersion);      // uint4
@@ -202,14 +203,13 @@ public:
         *ptr++ = (uint8_t) (crc & ByteMask);
 
         // Append the 4-byte CRC-32C (little-endian) of the payload.
-        txSerializeU32(frame.payload() + payload_actual_size, 
-            transferCRCCompute(payload_actual_size, frame.payload()));
+        txSerializeU32(frame.payload() + expected_size, 
+            transferCRCCompute(expected_size, frame.payload()));
 
 
         // Send via UDP to the Cyphal IPv4 multicast group for this subject
         //    (see spec §4.3.2.1: group = 239.0.0.(subject-id), port = 938296)
         ftl::ipv4::Endpoint ep{ftl::ipv4::Address(make_multicast_address(subject_id_)), uint16_t(9382)};
-        //ftl::ipv4::Endpoint ep{ftl::ipv4::Address("239.0.0.2"), uint16_t(9382)};
         socket_->send(std::move(frame), ep);
     }
 
