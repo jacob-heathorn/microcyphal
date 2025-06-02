@@ -5,30 +5,15 @@ set -e
 pushd $PROJECT_ROOT/scripts/package
 
 DSDL_PATH=~/.cyphal/uavcan
-OUT_PATH_C=$PROJECT_ROOT/.bin/generated/c
 OUT_PATH_CPP=$PROJECT_ROOT/.bin/generated/cpp
 
 echo "DSDL_PATH: $DSDL_PATH"
-echo "OUT_PATH_C: $OUT_PATH_C"
 echo "OUT_PATH_CPP: $OUT_PATH_CPP"
 
-# Create output directories if they don't exist
-mkdir -p "$OUT_PATH_C"
+# Create output directory if it doesn't exist
 mkdir -p "$OUT_PATH_CPP"
 
-# Generate C version
-echo "Generating C version..."
-poetry run nnvg \
-    --target-language c \
-    --language-standard c11 \
-    --include-experimental-languages \
-    --outdir "$OUT_PATH_C" \
-    --lookup-dir "$DSDL_PATH" \
-    --jobs 4 \
-    --verbose \
-    "$DSDL_PATH/node/7509.Heartbeat.1.0.dsdl"
-
-# Generate C++ version
+# Generate C++ version only
 echo "Generating C++ version..."
 poetry run nnvg \
     --target-language cpp \
@@ -40,7 +25,5 @@ poetry run nnvg \
     --verbose \
     "$DSDL_PATH/node/7509.Heartbeat.1.0.dsdl"
 
-echo "Generated C files:"
-find "$OUT_PATH_C" -name "*.h" | head -10
 echo "Generated C++ files:"
 find "$OUT_PATH_CPP" -name "*.hpp" | head -10
