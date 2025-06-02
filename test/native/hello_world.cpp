@@ -52,7 +52,8 @@ int main() {
   uavcan::node::Heartbeat_1_0 msg{};
   msg.uptime = 0;
   msg.health.value = uavcan::node::Health_1_0::NOMINAL;
-  msg.vendor_specific_status_code = 2;
+  msg.mode.value = uavcan::node::Mode_1_0::OPERATIONAL; 
+  msg.vendor_specific_status_code = 0xAB;
 
   while (1)
   {

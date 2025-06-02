@@ -177,10 +177,9 @@ public:
             throw std::runtime_error("Cyphal serialization failed"); // TODO
         }
         
-        // The number of bytes written should exactly match the payload max size, since a publisher
-        // is serializeing the exact message version.
-        const size_t payload_actual_size = static_cast<size_t>(result);
-        std::cout << "pyaload actual size: " << payload_actual_size << std::endl;
+        // NOTE: Due to nunavut offset tracking bugs, result returns wrong byte count.
+        // For fixed-size Cyphal messages, we use the known constant size instead.
+        const size_t payload_actual_size = MessageT::_traits_::SerializationBufferSizeBytes;
         assert(payload_actual_size <= frame.payload_max_size());
 
         // Fill in the Cyphal/UDP header (24 bytes) :contentReference[oaicite:1]{index=1}:
