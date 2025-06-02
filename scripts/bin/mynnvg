@@ -4,13 +4,26 @@ set -e
 
 pushd $PROJECT_ROOT/scripts/package
 
-DSDL_PATH=~/.cyphal
+DSDL_PATH=~/.cyphal/uavcan
 OUT_PATH=$PROJECT_ROOT/.bin/generated/nunavut_out
 
+echo "DSDL_PATH: $DSDL_PATH"
+echo "OUT_PATH: $OUT_PATH"
+
+# Create output directory if it doesn't exist
+mkdir -p "$OUT_PATH"
+
+# Generate specific heartbeat message that we know works
+echo "Generating Heartbeat message..."
 poetry run nnvg \
     --target-language cpp \
-    --target-endianness any \
+    --language-standard c++17 \
     --include-experimental-languages \
     --outdir "$OUT_PATH" \
     --lookup-dir "$DSDL_PATH" \
-    uavcan
+    --jobs 1 \
+    --verbose \
+    "$DSDL_PATH/node/7509.Heartbeat.1.0.dsdl"
+
+echo "Generated files:"
+find "$OUT_PATH" -name "*.hpp" | head -10
