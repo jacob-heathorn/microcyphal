@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+pushd $PROJECT_ROOT/scripts/package
+
+DSDL_PATH=~/.cyphal
+OUT_PATH=$PROJECT_ROOT/.bin/generated/nunavut_out
+
+poetry run nnvg \
+    --target-language cpp \
+    --target-endianness any \
+    --include-experimental-languages \
+    --outdir "$OUT_PATH" \
+    --lookup-dir "$DSDL_PATH" \
+    uavcan

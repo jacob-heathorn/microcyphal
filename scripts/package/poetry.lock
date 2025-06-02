@@ -321,6 +321,39 @@ files = [
 ]
 
 [[package]]
+name = "nunavut"
+version = "3.0.0.dev1"
+description = "Generate code from DSDL using Jinja2 templates."
+optional = false
+python-versions = "*"
+files = []
+develop = true
+
+[package.dependencies]
+pydsdl = ">=1.22.2"
+
+[package.extras]
+config = ["pyyaml"]
+python-requires = ["3.8"]
+shell = ["argcomplete"]
+zip-safe = ["False"]
+
+[package.source]
+type = "directory"
+url = "../../../nunavut"
+
+[[package]]
+name = "pydsdl"
+version = "1.22.2"
+description = "Cyphal DSDL processing frontend"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pydsdl-1.22.2-py3-none-any.whl", hash = "sha256:214059a037da7ca6e02b1660f96e07823e393288d399ba7e9641e249dc6d3eec"},
+    {file = "pydsdl-1.22.2.tar.gz", hash = "sha256:e85a6370e80f7bf538c01a7dfb0d981630e75d3dee733c86eaa5aa676ce4bbc9"},
+]
+
+[[package]]
 name = "pyserial"
 version = "3.5"
 description = "Python Serial Port Extension"
@@ -370,4 +403,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "22eac53a341583a2df992bc358d13170fd7942bf32bca048fec8de342bc91d19"
+content-hash = "182c0ea539b9b406c1d3036ad93c71466a3d2d1a35d0f078ba0bbfc158b1e5b7"
