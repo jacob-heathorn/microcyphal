@@ -5,7 +5,7 @@ set -e
 pushd $PROJECT_ROOT/scripts/package
 
 DSDL_PATH=~/.cyphal/uavcan
-OUT_PATH_CPP=$PROJECT_ROOT/.bin/generated/cpp
+OUT_PATH_CPP=$PROJECT_ROOT/.bin/generated/cpp17
 
 echo "DSDL_PATH: $DSDL_PATH"
 echo "OUT_PATH_CPP: $OUT_PATH_CPP"
