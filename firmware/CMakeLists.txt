@@ -1,8 +1,11 @@
 add_library(microcyphal INTERFACE) # TODO static?
+
 target_include_directories(microcyphal INTERFACE 
   ${CMAKE_CURRENT_LIST_DIR}/include
-  ${CMAKE_CURRENT_LIST_DIR}/../.bin/generated/cpp17
 )
+
+# Link against the generated Cyphal library (includes headers and dependencies automatically)
+target_link_libraries(microcyphal INTERFACE cyphal_generated_types)
 # platformify(microcyphal)
 
 file(GLOB_RECURSE headers CONFIGURE_DEPENDS
