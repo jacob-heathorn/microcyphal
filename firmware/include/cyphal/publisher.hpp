@@ -170,7 +170,7 @@ public:
 
         // Serialize into the frame's payload with nanavut.
         // Use explicit cast to avoid constructor ambiguity in bitspan
-        nunavut::support::bitspan payload_span{frame.payload(), frame.payload_max_size()};
+        nunavut::support::bitspan payload_span{static_cast<uint8_t*>(frame.payload()), frame.payload_max_size()};
 
         const nunavut::support::SerializeResult result = serialize(msg, payload_span);
         if (result < 0)
