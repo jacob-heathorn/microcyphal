@@ -13,7 +13,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Testing
 
-- **Run Tests**: `cd .bin/native-release/ && ctest`
+- **Build & Run Tests**: `cmake --workflow --preset native-debug && cd .bin/native-debug && ctest --verbose`
+- **Run Tests Only**: `cd .bin/native-debug && ctest --verbose`
+- **Run Failed Tests**: `cd .bin/native-debug && ctest --rerun-failed --output-on-failure`
+- **Run Specific Test**: `cd .bin/native-debug && ctest -R ut-cyphal --verbose`
 
 ## Architecture Overview
 
