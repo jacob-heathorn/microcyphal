@@ -51,17 +51,17 @@ using nunavut::support::const_bitspan;
 using nunavut::support::SerializeResult;
 
 TEST(HeartbeatRoundTripTest, SerializeDeserialize) {
-  // FIXED: This test now works by avoiding the nunavut C++ constructor ambiguity bug
+  // FIXED: This test now works correctly with the nunavut C++ constructor ambiguity fix
   //
   // The issue was a constructor ambiguity in const_bitspan:
   // - const_bitspan(array, size) was calling the wrong constructor
   // - It interpreted 'size' as 'offset_bits' instead of buffer size
-  // - This caused reads from wrong memory positions
+  // - This caused data corruption during deserialization
   //
   // Solution: Use explicit cast to force pointer constructor:
   // - const_bitspan(static_cast<const uint8_t*>(raw_buf), kBufSizeBytes)
   //
-  // The serialization was always correct, only deserialization had offset issues.
+  // Both serialization and deserialization now work correctly and return proper byte counts.
   
   Heartbeat_1_0 msg_orig;
   msg_orig.uptime                     = 0x12345678;  // Should be 0x78 0x56 0x34 0x12 (little-endian)
@@ -73,23 +73,23 @@ TEST(HeartbeatRoundTripTest, SerializeDeserialize) {
   uint8_t raw_buf[kBufSizeBytes];
   std::memset(raw_buf, 0, kBufSizeBytes);
 
-  // Serialize - this works correctly and produces proper Cyphal message format
-  bitspan out_span(raw_buf, kBufSizeBytes);
+  // Serialize - explicitly use pointer constructor to avoid ambiguity
+  bitspan out_span(static_cast<uint8_t*>(raw_buf), kBufSizeBytes);
   SerializeResult ser_ret = serialize(msg_orig, out_span);
   ASSERT_GE(ser_ret, 0) << "Serialization failed";
-  // NOTE: ser_ret returns 1 instead of 7 due to offset bug, but data is correct
+  EXPECT_EQ(static_cast<size_t>(ser_ret.value()), kBufSizeBytes) << "Serialization should return 7 bytes";
 
   // Deserialize - explicitly use pointer constructor to avoid ambiguity
   Heartbeat_1_0 msg_copy;
   const const_bitspan in_span(static_cast<const uint8_t*>(raw_buf), kBufSizeBytes);
   SerializeResult deser_ret = deserialize(msg_copy, in_span);
   ASSERT_GE(deser_ret, 0) << "Deserialization failed";
-  // NOTE: With explicit cast, deserialization should work correctly
+  EXPECT_EQ(static_cast<size_t>(deser_ret.value()), kBufSizeBytes) << "Deserialization should return 7 bytes";
 
-  // These comparisons should now PASS with the explicit cast fix:
-  EXPECT_EQ(msg_copy.uptime, msg_orig.uptime);                          // Should pass now
-  EXPECT_EQ(msg_copy.health.value, msg_orig.health.value);              // Should pass
-  EXPECT_EQ(msg_copy.mode.value, msg_orig.mode.value);                  // Should pass now  
-  EXPECT_EQ(msg_copy.vendor_specific_status_code, msg_orig.vendor_specific_status_code);  // Should pass now
+  // Verify data integrity - all fields should match exactly:
+  EXPECT_EQ(msg_copy.uptime, msg_orig.uptime);
+  EXPECT_EQ(msg_copy.health.value, msg_orig.health.value);
+  EXPECT_EQ(msg_copy.mode.value, msg_orig.mode.value);
+  EXPECT_EQ(msg_copy.vendor_specific_status_code, msg_orig.vendor_specific_status_code);
 }
 #endif
