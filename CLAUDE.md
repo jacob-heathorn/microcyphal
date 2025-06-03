@@ -94,6 +94,11 @@ This is a lightweight Cyphal/UDP stack for embedded systems with the following k
 - Memory allocation uses `ftl::BumpAllocator` for embedded compatibility
 - All C++ code targets C++17 standard with extensions disabled for portability
 
+## Coding Style Guidance
+
+- Use Google style guide with lowerCamelCase method names
+- Use "//" comments instead of "/*" comments
+
 ## References
 
 - [Cyphal Specification](https://opencyphal.org/specification) - The official protocol specification this implementation follows
