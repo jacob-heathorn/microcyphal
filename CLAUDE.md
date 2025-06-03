@@ -96,8 +96,17 @@ This is a lightweight Cyphal/UDP stack for embedded systems with the following k
 
 ## Coding Style Guidance
 
-- Use Google style guide with lowerCamelCase method names
-- Use "//" comments instead of "/*" comments
+This project follows the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) with these specific modifications:
+
+### Naming Conventions
+- **Method names**: Use lowerCamelCase (e.g., `publishMessage()`, `getNodeId()`)
+- **Member variables**: Use snake_case (e.g., `node_id_`, `transfer_count_`)
+- **Accessors/mutators**: May be named like variables
+  - Example: `int count()` and `void set_count(int count)`
+
+### Comments
+- Use `//` for single-line comments instead of `/* */` style comments
+- Follow Google style guide recommendations for documentation comments
 
 ## References
 
