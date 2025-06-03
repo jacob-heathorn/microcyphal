@@ -1,8 +1,4 @@
-# Include guard
-if(DEFINED _ADD_MICROCYPHAL_LIBRARY_CMAKE_)
-    return()
-endif()
-set(_ADD_MICROCYPHAL_LIBRARY_CMAKE_ TRUE)
+include_guard(GLOBAL)
 
 # Find Nunavut package in the specified path
 find_package(Nunavut REQUIRED PATHS "$ENV{NUNAVUT_ROOT}" NO_DEFAULT_PATH)
