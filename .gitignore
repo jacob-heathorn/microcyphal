@@ -2,6 +2,5 @@
 /.direnv
 /.pycache
 /scripts/package/.venv
-/Testing
 /.claude
 /scripts/package/pyproject.toml

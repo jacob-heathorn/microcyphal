@@ -29,9 +29,11 @@ This is a lightweight Cyphal/UDP stack for embedded systems with the following k
 - **Memory Management**: Uses bump allocator pattern for embedded-friendly memory allocation
 
 ### Message System
-- Auto-generated UAVCAN message types from DSDL definitions in `firmware/include/cpp14/` and `cpp17/`
+- Auto-generated UAVCAN message types from DSDL definitions using Nunavut
+- Generated types are placed in `.bin/<preset>/generated/cpp<standard>/` (e.g., `.bin/native-debug/generated/cpp17/`)
 - Messages follow the pattern `uavcan::node::MessageType_X_Y` (e.g., `Heartbeat_1_0`, `Health_1_0`)
 - Serialization handled by nunavut support library
+- Uses environment variables from .envrc: `NUNAVUT_ROOT`, `PYDSDL_ROOT`, `PUBLIC_REGULATED_DATA_TYPES_ROOT`
 
 ### Key Implementation Details
 - Single-frame transfers only (no multi-frame support yet)
@@ -40,15 +42,25 @@ This is a lightweight Cyphal/UDP stack for embedded systems with the following k
 - Transfer IDs auto-increment per publisher instance
 
 ### Project Structure
-- `firmware/` - Core Cyphal implementation and generated message types
+- `firmware/` - Core Cyphal implementation
 - `test/native/` - Native platform tests and examples
 - `scripts/` - Build tooling (rip.py) and packaging
-- `cmake/` - Build configuration that defers to external Forge framework
+- `cmake/` - Build configuration including:
+  - `utilities.cmake` - Provides `add_microcyphal_library()` function for DSDL code generation
+  - Platform-specific configurations that defer to external Forge framework
 
 ## Development Notes
 
-- The project depends on an external "Forge" framework (defined in gordion.yaml)
+- The project depends on external repositories managed by gordion (defined in gordion.yaml):
+  - Forge framework for build infrastructure
+  - Nunavut for DSDL code generation
+  - PyDSDL for DSDL parsing
+  - OpenCyphal public_regulated_data_types for standard message definitions
 - Build system uses CMake presets that include configurations from `$FORGE_ROOT`
+- DSDL code generation is handled by `add_microcyphal_library()` function which:
+  - Automatically finds all `.dsdl` files in the specified namespace
+  - Generates C++ code matching the project's C++ standard
+  - Creates CMake targets for linking
 - Current error handling uses basic `std::cout`/`std::cerr` - no structured logging framework
 - Memory allocation uses `ftl::BumpAllocator` for embedded compatibility
 - All C++ code targets C++17 standard with extensions disabled for portability

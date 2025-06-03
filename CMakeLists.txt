@@ -10,30 +10,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Enable testing with ctest
 enable_testing()
 
+# Configure CTest to create Testing folder in the build directory
+set(CTEST_BINARY_DIRECTORY "${CMAKE_BINARY_DIR}")
+set(CTEST_OUTPUT_ON_FAILURE ON)
+
 # Make the platform module accessible from anywhere in the tree.
 list(APPEND CMAKE_MODULE_PATH ${PLATFORM_PATH})
-
-# Add Nunavut CMake module path and use official Nunavut functions
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/home/jacob/embedded/nxp/nunavut")
-find_package(Nunavut REQUIRED)
-
-# Generate Cyphal DSDL headers using official Nunavut CMake functions
-file(GLOB_RECURSE DSDL_FILES "$ENV{HOME}/.cyphal/uavcan/*.dsdl")
-
-add_cyphal_library(
-    NAME cyphal_generated_types
-    EXACT_NAME
-    LANGUAGE cpp
-    LANGUAGE_STANDARD c++17
-    ALLOW_EXPERIMENTAL_LANGUAGES
-    OMIT_PUBLIC_REGULATED_NAMESPACE
-    DSDL_FILES ${DSDL_FILES}
-    OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp17"
-    OUT_LIBRARY_TARGET CYPHAL_LIB_TARGET
-    OUT_CODEGEN_TARGET CYPHAL_CODEGEN_TARGET
-)
-
-set(CYPHAL_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp17" CACHE PATH "Directory containing generated Cyphal headers")
 
 # Add the platform module here at the root of the tree.
 include(platform)

@@ -4,8 +4,15 @@ target_include_directories(microcyphal INTERFACE
   ${CMAKE_CURRENT_LIST_DIR}/include
 )
 
+# Generate standard uavcan message library
+include(${CMAKE_SOURCE_DIR}/cmake/utilities.cmake)
+add_microcyphal_library(
+    NAME standard_uavcan_types
+    NAMESPACE_PATH "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan"
+)
+
 # Link against the generated Cyphal library (includes headers and dependencies automatically)
-target_link_libraries(microcyphal INTERFACE cyphal_generated_types)
+target_link_libraries(microcyphal INTERFACE standard_uavcan_types)
 # platformify(microcyphal)
 
 file(GLOB_RECURSE headers CONFIGURE_DEPENDS
