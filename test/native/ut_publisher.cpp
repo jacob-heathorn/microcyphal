@@ -213,7 +213,7 @@ TEST_F(PublisherTest, PublisherWithReceiver) {
     std::cout << std::endl;
     
     // Validate Cyphal/UDP frame structure
-    ASSERT_GE(received_bytes, 24u) << "Frame must be at least 24 bytes (header size)";
+    ASSERT_GE(received_bytes, cyphal::UdpFrame::kHeaderSize) << "Frame must be at least header size bytes";
     
     // Parse header fields according to UdpFrame layout
     const uint8_t* header = payload.data();
@@ -262,21 +262,21 @@ TEST_F(PublisherTest, PublisherWithReceiver) {
     
     // Header CRC (16 bits big-endian) - bytes 22-23
     const uint16_t received_header_crc = (uint16_t(header[22]) << 8) | header[23];
-    const uint16_t computed_header_crc = etl::crc16_ccitt(header, header + 22);
+    const uint16_t computed_header_crc = etl::crc16_ccitt(header, header + cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kHeaderCrcSize);
     EXPECT_EQ(received_header_crc, computed_header_crc) << "Header CRC should be valid";
     
     std::cout << "Header CRC: received=0x" << std::hex << received_header_crc 
                 << ", computed=0x" << computed_header_crc << std::dec << std::endl;
     
     // Payload and payload CRC
-    if (received_bytes > 24) {
-        const size_t payload_size = received_bytes - 24 - 4;  // Total - header - payload CRC
-        const uint8_t* payload_data = header + 24;
+    if (received_bytes > cyphal::UdpFrame::kHeaderSize) {
+        const size_t payload_size = received_bytes - cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kTransferCrcSize;
+        const uint8_t* payload_data = header + cyphal::UdpFrame::kHeaderSize;
         const uint8_t* payload_crc_bytes = payload_data + payload_size;
         
         // Extract payload CRC (little-endian)
         uint32_t received_payload_crc = 0;
-        for (int i = 0; i < 4; ++i) {
+        for (size_t i = 0; i < cyphal::UdpFrame::kTransferCrcSize; ++i) {
             received_payload_crc |= (uint32_t(payload_crc_bytes[i]) << (i * 8));
         }
         

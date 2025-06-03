@@ -18,8 +18,6 @@ using byte_t = uint8_t;
 static const uint_fast8_t ByteWidth = 8U;
 static const byte_t       ByteMask  = 0xFFU;
 
-#define HEADER_CRC_SIZE_BYTES 2U
-
 static inline byte_t* txSerializeU32(byte_t* const destination_buffer, const uint32_t value)
 {
     byte_t* ptr = destination_buffer;
@@ -29,8 +27,6 @@ static inline byte_t* txSerializeU32(byte_t* const destination_buffer, const uin
     }
     return ptr;
 }
-
-#define TRANSFER_CRC_SIZE_BYTES 4U
 
 template <typename MessageT>
 class UdpPublisher {
@@ -88,8 +84,8 @@ public:
         // Header CRC in the big endian format. Optimization prospect noted from Udpard repository:
         // the header up to frame_index is constant in multi-frame transfers, so we don't really
         // need to recompute the CRC from scratch per frame.
-        const uint16_t crc = etl::crc16_ccitt(frame.header(), frame.header() + cyphal::UdpFrame::kHeaderSize - HEADER_CRC_SIZE_BYTES);
-        uint8_t *ptr = frame.header() + cyphal::UdpFrame::kHeaderSize - HEADER_CRC_SIZE_BYTES;
+        const uint16_t crc = etl::crc16_ccitt(frame.header(), frame.header() + cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kHeaderCrcSize);
+        uint8_t *ptr = frame.header() + cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kHeaderCrcSize;
         *ptr++ = (uint8_t) ((uint8_t) (crc >> ByteWidth) & ByteMask);
         *ptr++ = (uint8_t) (crc & ByteMask);
 

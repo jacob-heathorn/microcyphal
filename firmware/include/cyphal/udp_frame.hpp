@@ -49,6 +49,7 @@ private:
 public:
     static constexpr uint8_t kHeaderVersion = 1;
     static constexpr std::size_t kHeaderSize      = 24;
+    static constexpr std::size_t kHeaderCrcSize = 2;
     static constexpr std::size_t kTransferCrcSize = 4;
 
     // Constructs a UdpFrame with data_size bytes of application data.
