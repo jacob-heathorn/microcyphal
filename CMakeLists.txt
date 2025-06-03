@@ -25,11 +25,6 @@ add_microcyphal_library(
     NAMESPACE_PATH "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan"
 )
 
-# Set the generated directory path for compatibility
-set(CYPHAL_GENERATED_DIR "${cyphal_generated_types_GENERATED_DIR}" CACHE PATH "Directory containing generated Cyphal headers")
-set(CYPHAL_LIB_TARGET ${cyphal_generated_types_LIB_TARGET})
-set(CYPHAL_CODEGEN_TARGET ${cyphal_generated_types_CODEGEN_TARGET})
-
 # Add the platform module here at the root of the tree.
 include(platform)
 include(subdirectories)
