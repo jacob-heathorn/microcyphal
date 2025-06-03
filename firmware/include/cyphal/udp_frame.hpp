@@ -102,12 +102,7 @@ public:
 
     // uint64 transfer_id (bytes 8–15, little-endian)
     uint64_t transfer_id() const {
-        const uint8_t* d = data() + 8;
-        uint64_t v = 0;
-        for (int i = 0; i < 8; ++i) {
-            v |= static_cast<uint64_t>(d[i]) << (8 * i);
-        }
-        return v;
+        return ReadU64LE(data() + 8);
     }
 
     // uint31 frame_index (bits 0:30 of the 32-bit word in bytes 16–19)
@@ -188,10 +183,7 @@ public:
 
     // uint64 transfer_id (bytes 8–15, little-endian)
     void set_transfer_id(uint64_t v) {
-        uint8_t* d = data() + 8;
-        for (int i = 0; i < 8; ++i) {
-            d[i] = static_cast<uint8_t>((v >> (8 * i)) & 0xFF);
-        }
+        WriteU64LE(data() + 8, v);
     }
 
     // uint31 frame_index (bits 0:30 of bytes 16–19)
