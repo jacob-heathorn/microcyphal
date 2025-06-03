@@ -18,16 +18,6 @@ using byte_t = uint8_t;
 static const uint_fast8_t ByteWidth = 8U;
 static const byte_t       ByteMask  = 0xFFU;
 
-static inline byte_t* txSerializeU32(byte_t* const destination_buffer, const uint32_t value)
-{
-    byte_t* ptr = destination_buffer;
-    for (size_t i = 0; i < sizeof(value); i++)  // We sincerely hope that the compiler will use memcpy.
-    {
-        *ptr++ = (byte_t) ((byte_t) (value >> (i * ByteWidth)) & ByteMask);
-    }
-    return ptr;
-}
-
 template <typename MessageT>
 class UdpPublisher {
 public:
@@ -90,8 +80,10 @@ public:
         *ptr++ = (uint8_t) (crc & ByteMask);
 
         // Append the 4-byte CRC-32C (little-endian) of the payload.
-        txSerializeU32(frame.payload() + expected_size, 
-            etl::crc32_c(frame.payload(), frame.payload() + expected_size));
+        const uint32_t payload_crc = etl::crc32_c(frame.payload(), frame.payload() + expected_size);
+        nunavut::support::bitspan crc_span{frame.payload() + expected_size, cyphal::UdpFrame::kTransferCrcSize};
+        auto crc_result = crc_span.setUxx(payload_crc, 32);
+        assert(crc_result.has_value());  // Should not fail with proper buffer size
 
 
         // Send via UDP to the Cyphal IPv4 multicast group for this subject
