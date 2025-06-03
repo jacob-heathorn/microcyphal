@@ -15,6 +15,10 @@ list(APPEND CMAKE_MODULE_PATH ${PLATFORM_PATH})
 
 # Add Nunavut CMake module path and use official Nunavut functions
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/home/jacob/embedded/nxp/nunavut")
+
+# Override submodules directory to use external repositories
+set(NUNAVUT_SUBMODULES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
+
 find_package(Nunavut REQUIRED)
 
 # Generate Cyphal DSDL headers using official Nunavut CMake functions
@@ -27,6 +31,7 @@ add_cyphal_library(
     LANGUAGE_STANDARD c++17
     ALLOW_EXPERIMENTAL_LANGUAGES
     OMIT_PUBLIC_REGULATED_NAMESPACE
+    PYDSDL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../pydsdl"
     DSDL_FILES ${DSDL_FILES}
     OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp17"
     OUT_LIBRARY_TARGET CYPHAL_LIB_TARGET
