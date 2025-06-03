@@ -105,6 +105,7 @@ This project follows the [Google C++ Style Guide](https://google.github.io/style
 - **Member variables**: Use snake_case (e.g., `node_id_`, `transfer_count_`)
 - **Accessors/mutators**: May be named like variables
   - Example: `int count()` and `void set_count(int count)`
+- **Indenting**: 2 spaces
 
 ### Comments
 - Use `//` for single-line comments instead of `/* */` style comments

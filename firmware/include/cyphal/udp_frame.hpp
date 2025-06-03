@@ -45,7 +45,7 @@ class UdpFrame final : public ftl::ipv4::udp::Payload {
 
 private:
     // Don't let users get confused by base class accessors.
-    using ftl::ipv4::udp::Payload::data;
+    using ftl::ipv4::udp::Payload::front;
 
 public:
     static constexpr uint8_t kHeaderVersion = 1;
@@ -125,11 +125,11 @@ public:
         return ftl::ReadU16BE(header() + 22);
     }
 
-    uint8_t* header() noexcept { return data(); }
-    const uint8_t* header() const noexcept { return data(); }
+    uint8_t* header() noexcept { return front(); }
+    const uint8_t* header() const noexcept { return front(); }
 
-    uint8_t* payload() noexcept { return data() + kHeaderSize; }
-    const uint8_t* payload() const noexcept { return data() + kHeaderSize; }
+    uint8_t* payload() noexcept { return front() + kHeaderSize; }
+    const uint8_t* payload() const noexcept { return front() + kHeaderSize; }
     std::size_t payload_max_size() const noexcept { return size() - kHeaderSize - kTransferCrcSize; }
 
     //----------------------------------------------------------------------------

@@ -207,7 +207,7 @@ TEST_F(PublisherTest, PublisherWithReceiver) {
     // Print raw bytes for debugging
     std::cout << "Raw UDP data: ";
     for (size_t i = 0; i < received_bytes; ++i) {
-        printf("%02X ", payload.data()[i]);
+        printf("%02X ", payload.front()[i]);
         if ((i + 1) % 16 == 0) printf("\n               ");
     }
     std::cout << std::endl;
@@ -216,7 +216,7 @@ TEST_F(PublisherTest, PublisherWithReceiver) {
     ASSERT_GE(received_bytes, cyphal::UdpFrame::kHeaderSize) << "Frame must be at least header size bytes";
     
     // Parse header fields according to UdpFrame layout
-    const uint8_t* header = payload.data();
+    const uint8_t* header = payload.front();
     
     // Version (low 4 bits of byte 0) and Priority (bits 7:5 of byte 1)
     const uint8_t version = header[0] & 0x0F;  // Low nibble
