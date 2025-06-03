@@ -18,7 +18,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/add_microcyphal_library.cmake)
 
 # Generate Cyphal DSDL headers using our wrapper
 add_microcyphal_library(
-    NAME cyphal_generated_types
+    NAME standard_uavcan_types
     NAMESPACE_PATH "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan"
 )
 

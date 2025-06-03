@@ -8,7 +8,7 @@ target_include_directories(microcyphal INTERFACE
 )
 
 # Link against the generated Cyphal library (includes headers and dependencies automatically)
-target_link_libraries(microcyphal INTERFACE cyphal_generated_types)
+target_link_libraries(microcyphal INTERFACE standard_uavcan_types)
 # platformify(microcyphal)
 
 file(GLOB_RECURSE headers CONFIGURE_DEPENDS
