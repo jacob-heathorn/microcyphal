@@ -61,6 +61,6 @@ int main() {
     std::cout << "published health" << std::endl;
     
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    msg.uptime += 1'000'000;
+    msg.uptime += 1;
   }
 }
