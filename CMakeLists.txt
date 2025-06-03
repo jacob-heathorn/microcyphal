@@ -14,9 +14,7 @@ enable_testing()
 list(APPEND CMAKE_MODULE_PATH ${PLATFORM_PATH})
 
 # Add Nunavut CMake module path and use official Nunavut functions
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "$ENV{NUNAVUT_ROOT}")
-
-find_package(Nunavut REQUIRED)
+find_package(Nunavut REQUIRED PATHS "$ENV{NUNAVUT_ROOT}" NO_DEFAULT_PATH)
 
 # Generate Cyphal DSDL headers using official Nunavut CMake functions
 file(GLOB_RECURSE DSDL_FILES "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan/*.dsdl")
