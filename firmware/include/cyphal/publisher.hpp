@@ -76,13 +76,13 @@ public:
         const uint16_t header_crc = etl::crc16_ccitt(frame.header(), frame.header() + cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kHeaderCrcSize);
         
         // Write header CRC in big-endian format
-        writeU16BE(frame.header() + cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kHeaderCrcSize, header_crc);
+        WriteU16BE(frame.header() + cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kHeaderCrcSize, header_crc);
 
         // Append the 4-byte CRC-32C (little-endian) of the payload.
         const uint32_t payload_crc = etl::crc32_c(frame.payload(), frame.payload() + expected_size);
         
         // Write payload CRC in little-endian format
-        writeU32LE(frame.payload() + expected_size, payload_crc);
+        WriteU32LE(frame.payload() + expected_size, payload_crc);
 
         // Send via UDP to the Cyphal IPv4 multicast group for this subject
         //    (see spec §4.3.2.1: group = 239.0.0.(subject-id), port = 938296)

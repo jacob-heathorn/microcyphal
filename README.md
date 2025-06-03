@@ -101,6 +101,7 @@ This project follows the [Google C++ Style Guide](https://google.github.io/style
 
 ### Naming Conventions
 - **Method names**: Use lowerCamelCase (e.g., `publishMessage()`, `getNodeId()`)
+- **Regular/standalone functions**: Use UpperCamelCase (e.g., `WriteU16LE()`, `ReadU32BE()`)
 - **Member variables**: Use snake_case (e.g., `node_id_`, `transfer_count_`)
 - **Accessors/mutators**: May be named like variables
   - Example: `int count()` and `void set_count(int count)`

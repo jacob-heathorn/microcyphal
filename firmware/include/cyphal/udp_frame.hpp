@@ -82,22 +82,22 @@ public:
 
     // uint16 source_node_id (bytes 2–3, little-endian)
     uint16_t source_node_id() const {
-        return readU16LE(data() + 2);
+        return ReadU16LE(data() + 2);
     }
 
     // uint16 destination_node_id (bytes 4–5, little-endian)
     uint16_t destination_node_id() const {
-        return readU16LE(data() + 4);
+        return ReadU16LE(data() + 4);
     }
 
     // uint15 data_specifier (bits 0:14 of the 16-bit word in bytes 6–7)
     uint16_t data_specifier() const {
-        return readU16LE(data() + 6) & 0x7FFF;
+        return ReadU16LE(data() + 6) & 0x7FFF;
     }
 
     // bool service_not_message (bit 15 of the 16-bit word in bytes 6–7)
     bool service_not_message() const {
-        return ((readU16LE(data() + 6) >> 15) & 0x01) != 0;
+        return ((ReadU16LE(data() + 6) >> 15) & 0x01) != 0;
     }
 
     // uint64 transfer_id (bytes 8–15, little-endian)
@@ -112,22 +112,22 @@ public:
 
     // uint31 frame_index (bits 0:30 of the 32-bit word in bytes 16–19)
     uint32_t frame_index() const {
-        return readU32LE(data() + 16) & 0x7FFF'FFFFu;
+        return ReadU32LE(data() + 16) & 0x7FFF'FFFFu;
     }
 
     // bool end_of_transfer (bit 31 of the 32-bit word in bytes 16–19)
     bool end_of_transfer() const {
-        return ((readU32LE(data() + 16) >> 31) & 0x01) != 0;
+        return ((ReadU32LE(data() + 16) >> 31) & 0x01) != 0;
     }
 
     // uint16 user_data (bytes 20–21, little-endian)
     uint16_t user_data() const {
-        return readU16LE(data() + 20);
+        return ReadU16LE(data() + 20);
     }
 
     // uint16 header_crc16_big_endian (bytes 22–23, big-endian)
     uint16_t header_crc16() const {
-        return readU16BE(data() + 22);
+        return ReadU16BE(data() + 22);
     }
 
     uint8_t* header() noexcept { return data(); }
@@ -159,31 +159,31 @@ public:
 
     // uint16 source_node_id (bytes 2–3, little-endian)
     void set_source_node_id(uint16_t id) {
-        writeU16LE(data() + 2, id);
+        WriteU16LE(data() + 2, id);
     }
 
     // uint16 destination_node_id (bytes 4–5, little-endian)
     void set_destination_node_id(uint16_t id) {
-        writeU16LE(data() + 4, id);
+        WriteU16LE(data() + 4, id);
     }
 
     // uint15 data_specifier (bits 0:14 of bytes 6–7)
     void set_data_specifier(uint16_t ds) {
         ds &= 0x7FFF;
-        uint16_t w = readU16LE(data() + 6);
+        uint16_t w = ReadU16LE(data() + 6);
         w = (w & 0x8000) | ds;  // preserve bit 15, set bits 0:14
-        writeU16LE(data() + 6, w);
+        WriteU16LE(data() + 6, w);
     }
 
     // bool service_not_message (bit 15 of bytes 6–7)
     void set_service_not_message(bool s) {
-        uint16_t w = readU16LE(data() + 6);
+        uint16_t w = ReadU16LE(data() + 6);
         if (s) {
             w |= 0x8000;
         } else {
             w &= 0x7FFF;
         }
-        writeU16LE(data() + 6, w);
+        WriteU16LE(data() + 6, w);
     }
 
     // uint64 transfer_id (bytes 8–15, little-endian)
@@ -197,30 +197,30 @@ public:
     // uint31 frame_index (bits 0:30 of bytes 16–19)
     void set_frame_index(uint32_t idx) {
         idx &= 0x7FFF'FFFFu;
-        uint32_t w = readU32LE(data() + 16);
+        uint32_t w = ReadU32LE(data() + 16);
         w = (w & 0x8000'0000u) | idx;  // preserve bit 31, set bits 0:30
-        writeU32LE(data() + 16, w);
+        WriteU32LE(data() + 16, w);
     }
 
     // bool end_of_transfer (bit 31 of bytes 16–19)
     void set_end_of_transfer(bool e) {
-        uint32_t w = readU32LE(data() + 16);
+        uint32_t w = ReadU32LE(data() + 16);
         if (e) {
             w |= 0x8000'0000u;
         } else {
             w &= 0x7FFF'FFFFu;
         }
-        writeU32LE(data() + 16, w);
+        WriteU32LE(data() + 16, w);
     }
 
     // uint16 user_data (bytes 20–21, little-endian)
     void set_user_data(uint16_t u) {
-        writeU16LE(data() + 20, u);
+        WriteU16LE(data() + 20, u);
     }
 
     // uint16 header_crc16_big_endian (bytes 22–23, big-endian)
     void set_header_crc16(uint16_t crc) {
-        writeU16BE(data() + 22, crc);
+        WriteU16BE(data() + 22, crc);
     }
 };
 
