@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cstdint>
 #include <cstring>
 #include <utility>  // std::move
@@ -45,10 +46,7 @@ public:
         nunavut::support::bitspan payload_span{static_cast<uint8_t*>(frame.payload()), frame.payload_max_size()};
 
         const nunavut::support::SerializeResult result = serialize(msg, payload_span);
-        if (result < 0)
-        {
-            throw std::runtime_error("Cyphal serialization failed"); // TODO
-        }
+        assert(result >= 0 && "Cyphal serialization failed");
         
         // Verify serialization returned the expected size
         const size_t expected_size = MessageT::_traits_::SerializationBufferSizeBytes;
