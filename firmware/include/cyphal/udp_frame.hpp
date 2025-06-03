@@ -59,7 +59,7 @@ public:
       : ftl::ipv4::udp::Payload(kHeaderSize + data_size + kTransferCrcSize)
     {
         // Zero out the 24-byte header before setting fields.
-        memset(data(), 0, kHeaderSize);
+        memset(header(), 0, kHeaderSize);
         set_version(kHeaderVersion);
     }
 
@@ -72,57 +72,57 @@ public:
 
     // uint4 version (low nibble of byte 0)
     uint8_t version() const {
-        return data()[0] & 0x0F;
+        return header()[0] & 0x0F;
     }
 
     // uint3 priority (bits 7:5 of byte 1)
     uint8_t priority() const {
-        return (data()[1] >> 5) & 0x07;
+        return (header()[1] >> 5) & 0x07;
     }
 
     // uint16 source_node_id (bytes 2–3, little-endian)
     uint16_t source_node_id() const {
-        return ftl::ReadU16LE(data() + 2);
+        return ftl::ReadU16LE(header() + 2);
     }
 
     // uint16 destination_node_id (bytes 4–5, little-endian)
     uint16_t destination_node_id() const {
-        return ftl::ReadU16LE(data() + 4);
+        return ftl::ReadU16LE(header() + 4);
     }
 
     // uint15 data_specifier (bits 0:14 of the 16-bit word in bytes 6–7)
     uint16_t data_specifier() const {
-        return ftl::ReadU16LE(data() + 6) & 0x7FFF;
+        return ftl::ReadU16LE(header() + 6) & 0x7FFF;
     }
 
     // bool service_not_message (bit 15 of the 16-bit word in bytes 6–7)
     bool service_not_message() const {
-        return ((ftl::ReadU16LE(data() + 6) >> 15) & 0x01) != 0;
+        return ((ftl::ReadU16LE(header() + 6) >> 15) & 0x01) != 0;
     }
 
     // uint64 transfer_id (bytes 8–15, little-endian)
     uint64_t transfer_id() const {
-        return ftl::ReadU64LE(data() + 8);
+        return ftl::ReadU64LE(header() + 8);
     }
 
     // uint31 frame_index (bits 0:30 of the 32-bit word in bytes 16–19)
     uint32_t frame_index() const {
-        return ftl::ReadU32LE(data() + 16) & 0x7FFF'FFFFu;
+        return ftl::ReadU32LE(header() + 16) & 0x7FFF'FFFFu;
     }
 
     // bool end_of_transfer (bit 31 of the 32-bit word in bytes 16–19)
     bool end_of_transfer() const {
-        return ((ftl::ReadU32LE(data() + 16) >> 31) & 0x01) != 0;
+        return ((ftl::ReadU32LE(header() + 16) >> 31) & 0x01) != 0;
     }
 
     // uint16 user_data (bytes 20–21, little-endian)
     uint16_t user_data() const {
-        return ftl::ReadU16LE(data() + 20);
+        return ftl::ReadU16LE(header() + 20);
     }
 
     // uint16 header_crc16_big_endian (bytes 22–23, big-endian)
     uint16_t header_crc16() const {
-        return ftl::ReadU16BE(data() + 22);
+        return ftl::ReadU16BE(header() + 22);
     }
 
     uint8_t* header() noexcept { return data(); }
@@ -139,7 +139,7 @@ public:
     // uint4 version (low nibble of byte 0)
     void set_version(uint8_t v) {
         v &= 0x0F;
-        uint8_t& b = data()[0];
+        uint8_t& b = header()[0];
         b = (b & 0xF0)  // clear bits 3:0, keep bits 7:4 (reserved)
           |  (v);      // put version into bits 3:0
     }
@@ -147,72 +147,72 @@ public:
     // uint3 priority (bits 7:5 of byte 1)
     void set_priority(uint8_t p) {
         p &= 0x07;
-        uint8_t& b = data()[1];
+        uint8_t& b = header()[1];
         b = (b & 0x1F)      // clear bits 7:5, keep bits 4:0 (reserved)
           | (p << 5);       // put priority into bits 7:5
     }
 
     // uint16 source_node_id (bytes 2–3, little-endian)
     void set_source_node_id(uint16_t id) {
-        ftl::WriteU16LE(data() + 2, id);
+        ftl::WriteU16LE(header() + 2, id);
     }
 
     // uint16 destination_node_id (bytes 4–5, little-endian)
     void set_destination_node_id(uint16_t id) {
-        ftl::WriteU16LE(data() + 4, id);
+        ftl::WriteU16LE(header() + 4, id);
     }
 
     // uint15 data_specifier (bits 0:14 of bytes 6–7)
     void set_data_specifier(uint16_t ds) {
         ds &= 0x7FFF;
-        uint16_t w = ftl::ReadU16LE(data() + 6);
+        uint16_t w = ftl::ReadU16LE(header() + 6);
         w = (w & 0x8000) | ds;  // preserve bit 15, set bits 0:14
-        ftl::WriteU16LE(data() + 6, w);
+        ftl::WriteU16LE(header() + 6, w);
     }
 
     // bool service_not_message (bit 15 of bytes 6–7)
     void set_service_not_message(bool s) {
-        uint16_t w = ftl::ReadU16LE(data() + 6);
+        uint16_t w = ftl::ReadU16LE(header() + 6);
         if (s) {
             w |= 0x8000;
         } else {
             w &= 0x7FFF;
         }
-        ftl::WriteU16LE(data() + 6, w);
+        ftl::WriteU16LE(header() + 6, w);
     }
 
     // uint64 transfer_id (bytes 8–15, little-endian)
     void set_transfer_id(uint64_t v) {
-        ftl::WriteU64LE(data() + 8, v);
+        ftl::WriteU64LE(header() + 8, v);
     }
 
     // uint31 frame_index (bits 0:30 of bytes 16–19)
     void set_frame_index(uint32_t idx) {
         idx &= 0x7FFF'FFFFu;
-        uint32_t w = ftl::ReadU32LE(data() + 16);
+        uint32_t w = ftl::ReadU32LE(header() + 16);
         w = (w & 0x8000'0000u) | idx;  // preserve bit 31, set bits 0:30
-        ftl::WriteU32LE(data() + 16, w);
+        ftl::WriteU32LE(header() + 16, w);
     }
 
     // bool end_of_transfer (bit 31 of bytes 16–19)
     void set_end_of_transfer(bool e) {
-        uint32_t w = ftl::ReadU32LE(data() + 16);
+        uint32_t w = ftl::ReadU32LE(header() + 16);
         if (e) {
             w |= 0x8000'0000u;
         } else {
             w &= 0x7FFF'FFFFu;
         }
-        ftl::WriteU32LE(data() + 16, w);
+        ftl::WriteU32LE(header() + 16, w);
     }
 
     // uint16 user_data (bytes 20–21, little-endian)
     void set_user_data(uint16_t u) {
-        ftl::WriteU16LE(data() + 20, u);
+        ftl::WriteU16LE(header() + 20, u);
     }
 
     // uint16 header_crc16_big_endian (bytes 22–23, big-endian)
     void set_header_crc16(uint16_t crc) {
-        ftl::WriteU16BE(data() + 22, crc);
+        ftl::WriteU16BE(header() + 22, crc);
     }
 };
 
