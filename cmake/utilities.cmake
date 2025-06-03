@@ -35,13 +35,13 @@ function(add_microcyphal_library)
         DSDL_NAMESPACES "${ARG_NAMESPACE_PATH}"
         DSDL_FILES ${DSDL_FILES}
         EXTRA_GENERATOR_ARGS "--allow-unregulated-fixed-port-id"
-        OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp${CMAKE_CXX_STANDARD}"
+        OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/cpp${CMAKE_CXX_STANDARD}"
         OUT_LIBRARY_TARGET ${ARG_NAME}_LIB_TARGET
         OUT_CODEGEN_TARGET ${ARG_NAME}_CODEGEN_TARGET
     )
 
     # Export the generated directory path
-    set(${ARG_NAME}_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp${CMAKE_CXX_STANDARD}" PARENT_SCOPE)
+    set(${ARG_NAME}_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/cpp${CMAKE_CXX_STANDARD}" PARENT_SCOPE)
     
     # Also export the library and codegen targets
     set(${ARG_NAME}_LIB_TARGET ${${ARG_NAME}_LIB_TARGET} PARENT_SCOPE)
