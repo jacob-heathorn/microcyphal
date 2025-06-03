@@ -14,9 +14,6 @@
 
 namespace cyphal {
 
-using byte_t = uint8_t;
-
-
 template <typename MessageT>
 class UdpPublisher {
 public:
