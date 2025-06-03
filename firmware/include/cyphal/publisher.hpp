@@ -81,10 +81,13 @@ public:
 
         // Append the 4-byte CRC-32C (little-endian) of the payload.
         const uint32_t payload_crc = etl::crc32_c(frame.payload(), frame.payload() + expected_size);
-        nunavut::support::bitspan crc_span{frame.payload() + expected_size, cyphal::UdpFrame::kTransferCrcSize};
-        auto crc_result = crc_span.setUxx(payload_crc, 32);
-        assert(crc_result.has_value());  // Should not fail with proper buffer size
-
+        
+        // Direct byte-aligned write.
+        uint8_t* crc_ptr = frame.payload() + expected_size;
+        crc_ptr[0] = static_cast<uint8_t>(payload_crc & 0xFF);
+        crc_ptr[1] = static_cast<uint8_t>((payload_crc >> 8) & 0xFF);
+        crc_ptr[2] = static_cast<uint8_t>((payload_crc >> 16) & 0xFF);
+        crc_ptr[3] = static_cast<uint8_t>((payload_crc >> 24) & 0xFF);
 
         // Send via UDP to the Cyphal IPv4 multicast group for this subject
         //    (see spec §4.3.2.1: group = 239.0.0.(subject-id), port = 938296)
