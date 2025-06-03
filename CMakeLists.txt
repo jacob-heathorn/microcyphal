@@ -16,13 +16,10 @@ list(APPEND CMAKE_MODULE_PATH ${PLATFORM_PATH})
 # Add Nunavut CMake module path and use official Nunavut functions
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/home/jacob/embedded/nxp/nunavut")
 
-# Override submodules directory to use external repositories
-set(NUNAVUT_SUBMODULES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
-
 find_package(Nunavut REQUIRED)
 
 # Generate Cyphal DSDL headers using official Nunavut CMake functions
-file(GLOB_RECURSE DSDL_FILES "$ENV{HOME}/.cyphal/uavcan/*.dsdl")
+file(GLOB_RECURSE DSDL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../public_regulated_data_types/uavcan/*.dsdl")
 
 add_cyphal_library(
     NAME cyphal_generated_types
@@ -30,9 +27,10 @@ add_cyphal_library(
     LANGUAGE cpp
     LANGUAGE_STANDARD c++17
     ALLOW_EXPERIMENTAL_LANGUAGES
-    OMIT_PUBLIC_REGULATED_NAMESPACE
     PYDSDL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../pydsdl"
+    DSDL_NAMESPACES "${CMAKE_CURRENT_SOURCE_DIR}/../public_regulated_data_types/uavcan"
     DSDL_FILES ${DSDL_FILES}
+    EXTRA_GENERATOR_ARGS "--allow-unregulated-fixed-port-id"
     OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp17"
     OUT_LIBRARY_TARGET CYPHAL_LIB_TARGET
     OUT_CODEGEN_TARGET CYPHAL_CODEGEN_TARGET
