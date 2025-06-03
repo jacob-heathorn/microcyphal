@@ -3,6 +3,7 @@ add_platform_test(ut-simple ut_simple.cpp)
 add_platform_test(ut-cyphal
   ut_udp_frame.cpp
   ut_serialization.cpp
+  ut_publisher.cpp
 )
 target_link_libraries(ut-cyphal microcyphal)
 
