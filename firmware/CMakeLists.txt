@@ -1,10 +1,14 @@
-# Include the custom wrapper function
-include(${CMAKE_SOURCE_DIR}/cmake/add_microcyphal_library.cmake)
-
 add_library(microcyphal INTERFACE) # TODO static?
 
 target_include_directories(microcyphal INTERFACE 
   ${CMAKE_CURRENT_LIST_DIR}/include
+)
+
+# Generate standard uavcan message library
+include(${CMAKE_SOURCE_DIR}/cmake/utilities.cmake)
+add_microcyphal_library(
+    NAME standard_uavcan_types
+    NAMESPACE_PATH "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan"
 )
 
 # Link against the generated Cyphal library (includes headers and dependencies automatically)
