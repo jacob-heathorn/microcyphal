@@ -13,10 +13,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Testing
 
+### Unit Tests
 - **Build & Run Tests**: `cmake --workflow --preset native-debug && cd .bin/native-debug && ctest --verbose`
 - **Run Tests Only**: `cd .bin/native-debug && ctest --verbose`
 - **Run Failed Tests**: `cd .bin/native-debug && ctest --rerun-failed --output-on-failure`
 - **Run Specific Test**: `cd .bin/native-debug && ctest -R ut-cyphal --verbose`
+
+### Manual Testing with hello-world
+
+The hello-world example demonstrates publishing Cyphal heartbeat messages over UDP. You can monitor these messages using yakut:
+
+1. **Run the publisher**: 
+   ```bash
+   rip -r native-debug:hello-world
+   ```
+   This publishes heartbeat messages to UDP multicast address 239.0.0.1:9382 (subject ID 7509)
+
+2. **Monitor with yakut** (in another terminal):
+   ```bash
+   # Monitor all Cyphal/UDP traffic
+   yakut mon
+   
+   # Or subscribe specifically to heartbeat messages
+   yakut sub uavcan.node.Heartbeat.1.0
+   ```
+
+The heartbeat message contains:
+- `uptime`: Seconds since the node started
+- `health`: Node health status (0=nominal, 1=advisory, 2=caution, 3=warning)
+- `mode`: Node mode (0=operational, 1=initialization, 2=maintenance, 3=software_update)
 
 ## Architecture Overview
 
