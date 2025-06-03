@@ -15,8 +15,6 @@ namespace cyphal {
 
 using byte_t = uint8_t;
 
-static const uint_fast8_t ByteWidth = 8U;
-static const byte_t       ByteMask  = 0xFFU;
 
 template <typename MessageT>
 class UdpPublisher {
@@ -74,10 +72,12 @@ public:
         // Header CRC in the big endian format. Optimization prospect noted from Udpard repository:
         // the header up to frame_index is constant in multi-frame transfers, so we don't really
         // need to recompute the CRC from scratch per frame.
-        const uint16_t crc = etl::crc16_ccitt(frame.header(), frame.header() + cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kHeaderCrcSize);
-        uint8_t *ptr = frame.header() + cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kHeaderCrcSize;
-        *ptr++ = (uint8_t) ((uint8_t) (crc >> ByteWidth) & ByteMask);
-        *ptr++ = (uint8_t) (crc & ByteMask);
+        const uint16_t header_crc = etl::crc16_ccitt(frame.header(), frame.header() + cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kHeaderCrcSize);
+        
+        // Direct byte-aligned write in big-endian format
+        uint8_t* header_crc_ptr = frame.header() + cyphal::UdpFrame::kHeaderSize - cyphal::UdpFrame::kHeaderCrcSize;
+        header_crc_ptr[0] = static_cast<uint8_t>((header_crc >> 8) & 0xFF);
+        header_crc_ptr[1] = static_cast<uint8_t>(header_crc & 0xFF);
 
         // Append the 4-byte CRC-32C (little-endian) of the payload.
         const uint32_t payload_crc = etl::crc32_c(frame.payload(), frame.payload() + expected_size);
