@@ -23,18 +23,18 @@ add_cyphal_library(
     NAME cyphal_generated_types
     EXACT_NAME
     LANGUAGE cpp
-    LANGUAGE_STANDARD c++17
+    LANGUAGE_STANDARD c++${CMAKE_CXX_STANDARD}
     ALLOW_EXPERIMENTAL_LANGUAGES
     PYDSDL_PATH "$ENV{PYDSDL_ROOT}"
     DSDL_NAMESPACES "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan"
     DSDL_FILES ${DSDL_FILES}
     EXTRA_GENERATOR_ARGS "--allow-unregulated-fixed-port-id"
-    OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp17"
+    OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp${CMAKE_CXX_STANDARD}"
     OUT_LIBRARY_TARGET CYPHAL_LIB_TARGET
     OUT_CODEGEN_TARGET CYPHAL_CODEGEN_TARGET
 )
 
-set(CYPHAL_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp17" CACHE PATH "Directory containing generated Cyphal headers")
+set(CYPHAL_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp${CMAKE_CXX_STANDARD}" CACHE PATH "Directory containing generated Cyphal headers")
 
 # Add the platform module here at the root of the tree.
 include(platform)
