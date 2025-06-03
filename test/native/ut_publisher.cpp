@@ -17,25 +17,25 @@
 /*
  * Publisher Unit Tests
  * 
- * NOTE: These tests validate the publisher can be created and can send messages
- * without crashing, but they don't verify the actual UDP datagram content over
- * the network since we don't have a subscriber implementation yet.
+ * These tests validate the Cyphal/UDP publisher implementation by:
+ * 1. Testing publisher creation and basic functionality
+ * 2. Verifying the UDP frame structure and field layout
+ * 3. Receiving and validating actual UDP datagrams sent via multicast loopback
  * 
- * For end-to-end validation of the Cyphal/UDP frame format:
+ * The PublisherWithReceiver test performs end-to-end validation by:
+ * - Creating publisher and receiver sockets on the loopback interface
+ * - Publishing a Cyphal heartbeat message
+ * - Receiving the UDP datagram via multicast
+ * - Parsing and validating all header fields according to the Cyphal specification
+ * - Verifying both header CRC-16-CCITT and payload CRC-32C
+ * - Inspecting the serialized payload data
+ * 
+ * For manual testing with external tools:
  * 1. Run the hello-world example: `rip -r native-debug:hello-world`
  * 2. Monitor with yakut in another terminal:
- *    `yakut mon`
- *    or
- *    `yakut sub uavcan.node.Heartbeat.1.0`
+ *    `yakut mon` or `yakut sub uavcan.node.Heartbeat.1.0`
  * 
- * This will show that the publisher correctly sends Cyphal/UDP frames with:
- * - Subject ID 7509 (heartbeat)
- * - Proper multicast addressing (239.0.29.85:9382)
- * - Valid CRC checksums
- * - Correct header format according to the Cyphal specification
- * 
- * TODO: Implement a Cyphal subscriber to enable automated end-to-end testing
- *       of the publisher datagram format validation.
+ * This validates interoperability with the reference Cyphal implementation.
  */
 
 class PublisherTest : public ::testing::Test {
@@ -189,16 +189,16 @@ TEST_F(PublisherTest, PublisherWithReceiver) {
     // Publish the message
     publisher.publish(heartbeat);
     
-    // Give time for multicast delivery (increased for loopback)
+    // Give time for multicast delivery on loopback interface
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     
-    // Try to receive the message using FTL API
+    // Receive the multicast message
     ftl::ipv4::Endpoint sender;
     auto payload = socket->receive(&sender);
 
     ASSERT_TRUE(payload);
     
-    // We received data! Let's inspect it
+    // Validate the received UDP datagram
     const size_t received_bytes = payload.size();
         
     std::cout << "Received " << received_bytes << " bytes from " 
