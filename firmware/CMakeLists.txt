@@ -5,7 +5,7 @@ target_include_directories(microcyphal INTERFACE
 )
 
 # Generate standard uavcan message library
-include(${CMAKE_SOURCE_DIR}/cmake/utilities.cmake)
+include($ENV{MICROCYPHAL_ROOT}/cmake/utilities.cmake)
 add_microcyphal_library(
     NAME standard_uavcan_types
     NAMESPACE_PATH "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan"
@@ -21,4 +21,4 @@ file(GLOB_RECURSE headers CONFIGURE_DEPENDS
 )
 
 target_sources(microcyphal INTERFACE ${FTL_HEADERS})
-target_link_libraries(microcyphal INTERFACE ftl ftl-native)
+target_link_libraries(microcyphal INTERFACE ftl)

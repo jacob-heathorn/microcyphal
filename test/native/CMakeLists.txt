@@ -1,3 +1,5 @@
+target_link_libraries(microcyphal INTERFACE ftl-native)
+
 # Add a simple test both ways to verify both the pigweed and googletest frameworks
 add_platform_test(ut-simple ut_simple.cpp)
 add_platform_test(ut-cyphal
