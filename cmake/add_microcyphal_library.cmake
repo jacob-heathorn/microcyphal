@@ -4,6 +4,9 @@ if(DEFINED _ADD_MICROCYPHAL_LIBRARY_CMAKE_)
 endif()
 set(_ADD_MICROCYPHAL_LIBRARY_CMAKE_ TRUE)
 
+# Find Nunavut package in the specified path
+find_package(Nunavut REQUIRED PATHS "$ENV{NUNAVUT_ROOT}" NO_DEFAULT_PATH)
+
 # Custom wrapper function for add_cyphal_library
 function(add_microcyphal_library)
     cmake_parse_arguments(

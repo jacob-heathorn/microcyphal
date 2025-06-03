@@ -13,10 +13,7 @@ enable_testing()
 # Make the platform module accessible from anywhere in the tree.
 list(APPEND CMAKE_MODULE_PATH ${PLATFORM_PATH})
 
-# Add Nunavut CMake module path and use official Nunavut functions
-find_package(Nunavut REQUIRED PATHS "$ENV{NUNAVUT_ROOT}" NO_DEFAULT_PATH)
-
-# Include our custom wrapper function
+# Include our custom wrapper function (which also finds Nunavut)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/add_microcyphal_library.cmake)
 
 # Generate Cyphal DSDL headers using our wrapper
