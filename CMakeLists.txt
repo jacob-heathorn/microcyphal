@@ -16,25 +16,19 @@ list(APPEND CMAKE_MODULE_PATH ${PLATFORM_PATH})
 # Add Nunavut CMake module path and use official Nunavut functions
 find_package(Nunavut REQUIRED PATHS "$ENV{NUNAVUT_ROOT}" NO_DEFAULT_PATH)
 
-# Generate Cyphal DSDL headers using official Nunavut CMake functions
-file(GLOB_RECURSE DSDL_FILES "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan/*.dsdl")
+# Include our custom wrapper function
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/add_microcyphal_library.cmake)
 
-add_cyphal_library(
+# Generate Cyphal DSDL headers using our wrapper
+add_microcyphal_library(
     NAME cyphal_generated_types
-    EXACT_NAME
-    LANGUAGE cpp
-    LANGUAGE_STANDARD c++${CMAKE_CXX_STANDARD}
-    ALLOW_EXPERIMENTAL_LANGUAGES
-    PYDSDL_PATH "$ENV{PYDSDL_ROOT}"
-    DSDL_NAMESPACES "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan"
-    DSDL_FILES ${DSDL_FILES}
-    EXTRA_GENERATOR_ARGS "--allow-unregulated-fixed-port-id"
-    OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp${CMAKE_CXX_STANDARD}"
-    OUT_LIBRARY_TARGET CYPHAL_LIB_TARGET
-    OUT_CODEGEN_TARGET CYPHAL_CODEGEN_TARGET
+    NAMESPACE_PATH "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan"
 )
 
-set(CYPHAL_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp${CMAKE_CXX_STANDARD}" CACHE PATH "Directory containing generated Cyphal headers")
+# Set the generated directory path for compatibility
+set(CYPHAL_GENERATED_DIR "${cyphal_generated_types_GENERATED_DIR}" CACHE PATH "Directory containing generated Cyphal headers")
+set(CYPHAL_LIB_TARGET ${cyphal_generated_types_LIB_TARGET})
+set(CYPHAL_CODEGEN_TARGET ${cyphal_generated_types_CODEGEN_TARGET})
 
 # Add the platform module here at the root of the tree.
 include(platform)

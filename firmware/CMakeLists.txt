@@ -1,3 +1,6 @@
+# Include the custom wrapper function
+include(${CMAKE_SOURCE_DIR}/cmake/add_microcyphal_library.cmake)
+
 add_library(microcyphal INTERFACE) # TODO static?
 
 target_include_directories(microcyphal INTERFACE 
