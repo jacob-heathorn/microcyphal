@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Overview
+
+This repository implements a lightweight Cyphal/UDP stack for embedded systems, following the [Cyphal Specification](https://opencyphal.org/specification). Cyphal is an open communication protocol designed for aerospace and robotic applications.
+
 ## Build Commands
 
 - **Clean**: `rip -c` - Removes the .bin build folder
@@ -89,3 +93,9 @@ This is a lightweight Cyphal/UDP stack for embedded systems with the following k
 - Current error handling uses basic `std::cout`/`std::cerr` - no structured logging framework
 - Memory allocation uses `ftl::BumpAllocator` for embedded compatibility
 - All C++ code targets C++17 standard with extensions disabled for portability
+
+## References
+
+- [Cyphal Specification](https://opencyphal.org/specification) - The official protocol specification this implementation follows
+- [OpenCyphal Forum](https://forum.opencyphal.org/) - Community discussions and support
+- [DSDL Reference](https://github.com/OpenCyphal/public_regulated_data_types) - Standard data type definitions

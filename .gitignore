@@ -4,3 +4,5 @@
 /scripts/package/.venv
 /.claude
 /scripts/package/pyproject.toml
+/CLAUDE.local.md
+
