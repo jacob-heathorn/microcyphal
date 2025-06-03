@@ -14,12 +14,12 @@ enable_testing()
 list(APPEND CMAKE_MODULE_PATH ${PLATFORM_PATH})
 
 # Add Nunavut CMake module path and use official Nunavut functions
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "/home/jacob/embedded/nxp/nunavut")
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "$ENV{NUNAVUT_ROOT}")
 
 find_package(Nunavut REQUIRED)
 
 # Generate Cyphal DSDL headers using official Nunavut CMake functions
-file(GLOB_RECURSE DSDL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../public_regulated_data_types/uavcan/*.dsdl")
+file(GLOB_RECURSE DSDL_FILES "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan/*.dsdl")
 
 add_cyphal_library(
     NAME cyphal_generated_types
@@ -27,8 +27,8 @@ add_cyphal_library(
     LANGUAGE cpp
     LANGUAGE_STANDARD c++17
     ALLOW_EXPERIMENTAL_LANGUAGES
-    PYDSDL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../pydsdl"
-    DSDL_NAMESPACES "${CMAKE_CURRENT_SOURCE_DIR}/../public_regulated_data_types/uavcan"
+    PYDSDL_PATH "$ENV{PYDSDL_ROOT}"
+    DSDL_NAMESPACES "$ENV{PUBLIC_REGULATED_DATA_TYPES_ROOT}/uavcan"
     DSDL_FILES ${DSDL_FILES}
     EXTRA_GENERATOR_ARGS "--allow-unregulated-fixed-port-id"
     OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/.bin/generated/cpp17"
