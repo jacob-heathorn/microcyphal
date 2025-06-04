@@ -12,6 +12,11 @@ add_subdirectory(
 
 # Microcyphal
 add_subdirectory(
+  $ENV{MICROCYPHAL_ROOT}/firmware
+  ${CMAKE_BINARY_DIR}/microcyphal/firmware
+)
+add_subdirectory(
   $ENV{MICROCYPHAL_ROOT}/test/native
   ${CMAKE_BINARY_DIR}/microcyphal/test/native
 )
+
