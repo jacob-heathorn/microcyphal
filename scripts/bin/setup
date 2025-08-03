@@ -1,3 +1,0 @@
-#!/bin/bash
-set -e
-source $FORGE_ROOT/scripts/bin/setup
