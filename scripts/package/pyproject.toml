@@ -1,13 +1,16 @@
-[tool.poetry]
+[project]
 name = "microcyphal"
 version = "0.1.0"
 description = ""
-authors = ["Jacob Heathorn <jacob.heathorn@gmail.com>"]
+authors = [{name = "Jacob Heathorn", email = "jacob.heathorn@gmail.com"}]
+requires-python = ">=3.12"
+dependencies = [
+    "forge",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-forge = { path = "/home/jacob/embedded/nxp/forge/scripts/package", develop = true }
+[tool.pytest.ini_options]
+cache_dir = "../../.pycache"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
