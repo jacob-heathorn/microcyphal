@@ -29,10 +29,6 @@ int main() {
   // Initialize data frame class with the memory allocator.
   ftl::DataFrame::initialize(allocator);
 
-  cyphal::UdpFrame f(2);
-
-  std::cout << "version: " << (uint32_t)f.version() << std::endl;
-
   // Setup interface on loopback interface.
   ftl::ethernet::NativeEthernetInterface lo{Address{"127.0.0.1"}, Mask{"255.255.255.0"}};
   
