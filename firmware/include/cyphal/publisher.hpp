@@ -19,12 +19,12 @@ template <typename MessageT>
 class UdpPublisher {
 public:
     /// @param subject_id      The Cyphal subject-ID (0…8191).
-    /// @param transport       Reference to UdpTransport that manages the socket.
     /// @param source_node_id  Your node-ID (0…65534; 65535 = anonymous).
+    /// @param transport       Reference to UdpTransport that manages the socket.
     /// @param priority        Cyphal priority 0 (highest) … 7 (lowest).
     UdpPublisher(uint16_t subject_id,
-              UdpTransport& transport,
               uint16_t source_node_id,
+              UdpTransport& transport,
               uint8_t  priority = 0)
       : subject_id_(subject_id)
       , transport_(transport)

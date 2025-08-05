@@ -36,19 +36,21 @@ int main() {
   // Setup interface on loopback interface.
   ftl::ethernet::NativeEthernetInterface lo{Address{"127.0.0.1"}, Mask{"255.255.255.0"}};
   
-  // Create transport which handles socket creation and binding
+  // Create transport which handles socket creation and binding.
   cyphal::UdpTransport transport(lo);
 
-  // cyphal::UdpPublisher<uavcan::node::Health_1_0> publisher(kSubjectId, transport, kSourceNodeId);
+  // Create the heartbeat publisher.
   cyphal::UdpPublisher<uavcan::node::Heartbeat_1_0> publisher(uavcan::node::Heartbeat_1_0::_traits_::FixedPortId,
-    transport, kSourceNodeId);
+    kSourceNodeId, transport);
 
+  // Create a heartbeat message.
   uavcan::node::Heartbeat_1_0 msg{};
   msg.uptime = 0;
   msg.health.value = uavcan::node::Health_1_0::NOMINAL;
   msg.mode.value = uavcan::node::Mode_1_0::OPERATIONAL; 
   msg.vendor_specific_status_code = 0xAB;
 
+  // Publish every 1s.
   while (1)
   {
     publisher.publish(msg);
