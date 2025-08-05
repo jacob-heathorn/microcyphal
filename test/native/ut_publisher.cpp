@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <cyphal/publisher.hpp>
+#include <cyphal/udp_transport.hpp>
 #include <uavcan/node/Heartbeat_1_0.hpp>
 #include <ftl/native_udp_socket.hpp>
 #include <ftl/native_ethernet_interface.hpp>
@@ -63,16 +64,15 @@ TEST_F(PublisherTest, PublisherCanBeCreated) {
         ftl::ipv4::Mask(255, 0, 0, 0)
     );
     
-    // Create socket for publisher
-    auto socket = interface.CreateUdpSocket();
-    ASSERT_TRUE(socket->open());
+    // Create transport
+    cyphal::UdpTransport transport(interface);
     
     // Create publisher
     const uint16_t subject_id = 7509;  // Heartbeat subject ID
     const uint16_t node_id = 42;
     
     cyphal::UdpPublisher<uavcan::node::Heartbeat_1_0> publisher(
-        subject_id, std::move(socket), node_id, 4  // priority 4 = nominal
+        subject_id, transport, node_id, 4  // priority 4 = nominal
     );
     
     // Test passed if we get here without crash
@@ -86,16 +86,15 @@ TEST_F(PublisherTest, PublisherCanPublishMessage) {
         ftl::ipv4::Mask(255, 0, 0, 0)
     );
     
-    // Create socket for publisher
-    auto socket = interface.CreateUdpSocket();
-    ASSERT_TRUE(socket->open());
+    // Create transport
+    cyphal::UdpTransport transport(interface);
     
     // Create publisher
     const uint16_t subject_id = 7509;
     const uint16_t node_id = 42;
     
     cyphal::UdpPublisher<uavcan::node::Heartbeat_1_0> publisher(
-        subject_id, std::move(socket), node_id, 4
+        subject_id, transport, node_id, 4
     );
     
     // Create and publish a heartbeat message
@@ -158,25 +157,22 @@ TEST_F(PublisherTest, PublisherWithReceiver) {
         ftl::ipv4::Mask("255.255.255.0")
     );
     
-    // Use the same socket for both send and receive since NativeUdpSocket
-    // is designed to handle multicast loopback with dual file descriptors
-    auto socket = interface.CreateUdpSocket();
-    ASSERT_TRUE(socket->open(4));
-    ASSERT_TRUE(socket->bind(9382));
+    // Create transport for publishing
+    cyphal::UdpTransport transport(interface);
+    
+    // Create a separate socket for receiving since transport already bound port 9382
+    auto recv_socket = interface.CreateUdpSocket();
+    ASSERT_TRUE(recv_socket->open(4));
+    ASSERT_TRUE(recv_socket->bind(9383));  // Different port for receiver
     
     // Join multicast group for heartbeat subject
     const uint16_t subject_id = uavcan::node::Heartbeat_1_0::_traits_::FixedPortId;
     const uint32_t multicast_addr = 0xEF000000u | uint32_t(subject_id);
-    ASSERT_TRUE(socket->join_multicast_group(ftl::ipv4::Address(multicast_addr)));
-    
-    // Create a separate socket for publishing to avoid interference
-    auto pub_socket = interface.CreateUdpSocket();
-    ASSERT_TRUE(pub_socket->open(4));
-    ASSERT_TRUE(pub_socket->bind(9384));  // Different port for publisher
+    ASSERT_TRUE(recv_socket->join_multicast_group(ftl::ipv4::Address(multicast_addr)));
     
     const uint16_t node_id = 42;
     cyphal::UdpPublisher<uavcan::node::Heartbeat_1_0> publisher(
-        subject_id, std::move(pub_socket), node_id, 4
+        subject_id, transport, node_id, 4
     );
     
     // Create and publish a heartbeat message (like hello_world)
@@ -194,7 +190,7 @@ TEST_F(PublisherTest, PublisherWithReceiver) {
     
     // Receive the multicast message
     ftl::ipv4::Endpoint sender;
-    auto payload = socket->receive(&sender);
+    auto payload = recv_socket->receive(&sender);
 
     ASSERT_TRUE(payload);
     

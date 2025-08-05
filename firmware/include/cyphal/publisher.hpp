@@ -6,8 +6,8 @@
 #include <utility>  // std::move
 
 #include "cyphal/udp_frame.hpp"
+#include "cyphal/udp_transport.hpp"
 #include "ftl/byte_order.hpp"
-#include "ftl/ipv4/udp/socket.hpp"  // your UDP socket interface
 #include "nunavut/support/serialization.hpp"
 #include "etl/crc16_ccitt.h"
 #include "etl/crc32_c.h"
@@ -19,20 +19,19 @@ template <typename MessageT>
 class UdpPublisher {
 public:
     /// @param subject_id      The Cyphal subject-ID (0…8191).
-    /// @param socket          An already-opened UDP socket.
+    /// @param transport       Reference to UdpTransport that manages the socket.
     /// @param source_node_id  Your node-ID (0…65534; 65535 = anonymous).
     /// @param priority        Cyphal priority 0 (highest) … 7 (lowest).
     UdpPublisher(uint16_t subject_id,
-              ftl::ipv4::udp::SocketPtr socket,
+              UdpTransport& transport,
               uint16_t source_node_id,
               uint8_t  priority = 0)
       : subject_id_(subject_id)
-      , socket_{std::move(socket)}
+      , transport_(transport)
       , source_node_id_(source_node_id)
       , priority_(priority & 0x07)
       , transfer_id_(0)
     {
-        // bind or open the socket as needed (not shown)
     }
 
     /// Publish one message as a single‐frame Cyphal/UDP transfer.
@@ -80,25 +79,15 @@ public:
         ftl::WriteU32LE(frame.payload() + expected_size, payload_crc);
 
         // Send via UDP to the Cyphal IPv4 multicast group for this subject
-        //    (see spec §4.3.2.1: group = 239.0.0.(subject-id), port = 938296)
-        ftl::ipv4::Endpoint ep{ftl::ipv4::Address(make_multicast_address(subject_id_)), uint16_t(9382)};
-        socket_->send(std::move(frame), ep);
+        transport_.send(std::move(frame), subject_id_);
     }
 
 private:
     uint16_t subject_id_;
-    ftl::ipv4::udp::SocketPtr socket_;
+    UdpTransport& transport_;
     uint16_t source_node_id_;
     uint8_t  priority_;
     uint64_t transfer_id_;
-
-    // Helper to compute 239.0.(subject_id >> 8).(subject_id & 0xFF):
-    static uint32_t make_multicast_address(uint16_t subject_id) {
-        // 0xEF000000 = 239.0.0.0 in big-endian.  
-        // OR’ing in subject_id places the high byte of subject_id into
-        // the third octet, and the low byte into the fourth octet.
-        return 0xEF000000u | uint32_t(subject_id);
-    }
 };
 
 
