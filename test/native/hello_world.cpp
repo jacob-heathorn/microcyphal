@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include "cyphal/udp_frame.hpp"
-#include "cyphal/publisher.hpp"
+#include "cyphal/udp_publisher.hpp"
 #include "cyphal/udp_transport.hpp"
 #include "ftl/native_udp_socket.hpp"
 #include "ftl/native_ethernet_interface.hpp"

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <cyphal/publisher.hpp>
+#include <cyphal/udp_publisher.hpp>
 #include <cyphal/udp_transport.hpp>
 #include <uavcan/node/Heartbeat_1_0.hpp>
 #include <ftl/native_udp_socket.hpp>
