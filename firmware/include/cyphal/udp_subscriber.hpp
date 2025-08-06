@@ -119,7 +119,6 @@ public:
         }
         
         // Update the transfer ID for this source node
-        // If pool is exhausted, oldest entries will remain (not ideal but safe)
         last_transfer_ids_.insert(source_node_id, transfer_id);
         
         // Calculate payload size (total - header - CRC)
