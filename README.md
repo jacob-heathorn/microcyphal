@@ -99,4 +99,3 @@ This project follows the [Google C++ Style Guide](https://google.github.io/style
 - [Cyphal Specification](https://opencyphal.org/specification) - The official protocol specification this implementation follows
 - [OpenCyphal Forum](https://forum.opencyphal.org/) - Community discussions and support
 - [DSDL Reference](https://github.com/OpenCyphal/public_regulated_data_types) - Standard data type definitions
- 
