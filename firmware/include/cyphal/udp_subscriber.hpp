@@ -4,20 +4,31 @@
 #include <cstdint>
 #include <cstring>
 #include <optional>
-#include <unordered_map>
 
 #include "cyphal/udp_frame.hpp"
 #include "cyphal/udp_transport.hpp"
+#include "cyphal/pool_map.hpp"
 #include "ftl/byte_order.hpp"
 #include "nunavut/support/serialization.hpp"
 #include "etl/crc16_ccitt.h"
 #include "etl/crc32_c.h"
+#include "ftl/unique_bump_pool.hpp"
+#include "ftl/bump_allocator.hpp"
 
 namespace cyphal {
 
 template <typename MessageT>
 class UdpSubscriber {
 public:
+    /// Initialize the shared memory pool for duplicate detection
+    /// Must be called before creating any UdpSubscriber instances
+    /// @param allocator The bump allocator to use for node storage
+    ///                  The pool will grow dynamically as needed until this allocator runs out of memory
+    static void initializePool(ftl::BumpAllocator& allocator) {
+        // Initialize the PoolMap's internal shared pool
+        PoolMap<uint16_t, uint64_t>::initializePool(allocator);
+    }
+    
     /// @param subject_id      The Cyphal subject-ID to subscribe to (0…8191).
     /// @param node_id         Your node-ID (0…65534; 65535 = anonymous).
     /// @param transport       Reference to UdpTransport that manages the socket.
@@ -27,6 +38,7 @@ public:
         : subject_id_(subject_id)
         , node_id_(node_id)
         , transport_(transport)
+        , last_transfer_ids_()  // PoolMap will use its internal shared pool
     {
         // Join the multicast group for this subject
         transport_.joinMulticastGroup(subject_id_);
@@ -100,12 +112,15 @@ public:
             return std::nullopt;
         }
         
-        // Check for duplicate transfer (simple duplicate detection)
-        auto it = last_transfer_ids_.find(source_node_id);
-        if (it != last_transfer_ids_.end() && it->second == transfer_id) {
+        // Check for duplicate transfer using pool-based map
+        auto* last_id = last_transfer_ids_.find(source_node_id);
+        if (last_id && *last_id == transfer_id) {
             return std::nullopt;  // Duplicate transfer
         }
-        last_transfer_ids_[source_node_id] = transfer_id;
+        
+        // Update the transfer ID for this source node
+        // If pool is exhausted, oldest entries will remain (not ideal but safe)
+        last_transfer_ids_.insert(source_node_id, transfer_id);
         
         // Calculate payload size (total - header - CRC)
         const size_t payload_size = received_bytes - UdpFrame::kHeaderSize - UdpFrame::kTransferCrcSize;
@@ -137,9 +152,10 @@ private:
     uint16_t node_id_;
     UdpTransport& transport_;
     
-    // Simple duplicate detection - maps source node ID to last transfer ID
-    // TODO: Consider using a more sophisticated duplicate detection mechanism
-    std::unordered_map<uint16_t, uint64_t> last_transfer_ids_;
+    // Use pool-based map for duplicate detection
+    // This map shares a memory pool with all other UdpSubscriber instances
+    PoolMap<uint16_t, uint64_t> last_transfer_ids_;
 };
+
 
 }  // namespace cyphal

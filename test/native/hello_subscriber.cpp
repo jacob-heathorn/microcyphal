@@ -17,13 +17,19 @@ int main() {
     std::cout << "Cyphal/UDP Subscriber Demo\n";
     std::cout << "===========================\n\n";
 
-    // Create an allocator for the data frame
+    // Create allocators for data frames and duplicate detection
     static constexpr size_t POOL_MEMORY_SIZE = 16 * 1024;
+    static constexpr size_t DUP_DETECTION_SIZE = 4 * 1024;  // For duplicate detection map nodes
     uint8_t* buffer = new uint8_t[POOL_MEMORY_SIZE];
+    uint8_t* dup_buffer = new uint8_t[DUP_DETECTION_SIZE];
     ftl::BumpAllocator allocator(buffer, POOL_MEMORY_SIZE);
+    ftl::BumpAllocator dup_allocator(dup_buffer, DUP_DETECTION_SIZE);
 
     // Initialize data frame class with the memory allocator.
     ftl::DataFrame::initialize(allocator);
+    
+    // Initialize the shared pool for duplicate detection
+    cyphal::UdpSubscriber<uavcan::node::Heartbeat_1_0>::initializePool(dup_allocator);
 
     // Setup interface on loopback interface.
     ftl::ethernet::NativeEthernetInterface lo{Address{"127.0.0.1"}, Mask{"255.255.255.0"}};

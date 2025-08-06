@@ -18,7 +18,3 @@ target_link_libraries(hello-publisher microcyphal)
 add_executable(hello-subscriber hello_subscriber.cpp)
 platformify(hello-subscriber)
 target_link_libraries(hello-subscriber microcyphal)
-
-add_executable(debug-subscriber debug_subscriber.cpp)
-platformify(debug-subscriber)
-target_link_libraries(debug-subscriber microcyphal)
