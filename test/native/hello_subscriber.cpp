@@ -29,7 +29,7 @@ int main() {
     ftl::DataFrame::initialize(allocator);
     
     // Initialize the shared pool for duplicate detection
-    cyphal::UdpSubscriber<uavcan::node::Heartbeat_1_0>::initializePool(dup_allocator);
+    cyphal::UdpSubscriberLastTransferIdAllocator::initialize(dup_allocator);
 
     // Setup interface on loopback interface.
     ftl::ethernet::NativeEthernetInterface lo{Address{"127.0.0.1"}, Mask{"255.255.255.0"}};

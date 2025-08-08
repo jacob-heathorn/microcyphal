@@ -7,27 +7,42 @@
 
 #include "cyphal/udp_frame.hpp"
 #include "cyphal/udp_transport.hpp"
-#include "cyphal/pool_map.hpp"
 #include "ftl/byte_order.hpp"
 #include "nunavut/support/serialization.hpp"
 #include "etl/crc16_ccitt.h"
 #include "etl/crc32_c.h"
-#include "ftl/unique_bump_pool.hpp"
+#include "ftl/map.hpp"
+#include "ftl/bump_pool_allocator.hpp"
 #include "ftl/bump_allocator.hpp"
 
 namespace cyphal {
 
+/// Shared allocator for transfer ID tracking across all UdpSubscriber instances
+class UdpSubscriberLastTransferIdAllocator {
+public:
+    /// Initialize the shared allocator for transfer ID tracking.
+    /// Must be called once before creating any UdpSubscriber instances.
+    /// @param allocator The bump allocator to use for memory management.
+    static void initialize(ftl::BumpAllocator& allocator) {
+        if (allocator_ == nullptr) {
+            static ftl::BumpPoolAllocator pool_allocator(allocator);
+            allocator_ = &pool_allocator;
+        }
+    }
+    
+    /// Get the shared allocator instance.
+    /// @return Pointer to the shared allocator, or nullptr if not initialized.
+    static ftl::BumpPoolAllocator* get() {
+        return allocator_;
+    }
+    
+private:
+    inline static ftl::BumpPoolAllocator* allocator_ = nullptr;
+};
+
 template <typename MessageT>
 class UdpSubscriber {
 public:
-    /// Initialize the shared memory pool for duplicate detection
-    /// Must be called before creating any UdpSubscriber instances
-    /// @param allocator The bump allocator to use for node storage
-    ///                  The pool will grow dynamically as needed until this allocator runs out of memory
-    static void initializePool(ftl::BumpAllocator& allocator) {
-        // Initialize the PoolMap's internal shared pool
-        PoolMap<uint16_t, uint64_t>::initializePool(allocator);
-    }
     
     /// @param subject_id      The Cyphal subject-ID to subscribe to (0…8191).
     /// @param node_id         Your node-ID (0…65534; 65535 = anonymous).
@@ -38,8 +53,10 @@ public:
         : subject_id_(subject_id)
         , node_id_(node_id)
         , transport_(transport)
-        , last_transfer_ids_()  // PoolMap will use its internal shared pool
+        , last_transfer_ids_(*UdpSubscriberLastTransferIdAllocator::get())
     {
+        assert(UdpSubscriberLastTransferIdAllocator::get() != nullptr && 
+               "Must call UdpSubscriberLastTransferIdAllocator::initialize() before creating instances");
         // Join the multicast group for this subject
         transport_.joinMulticastGroup(subject_id_);
     }
@@ -112,14 +129,14 @@ public:
             return std::nullopt;
         }
         
-        // Check for duplicate transfer using pool-based map
-        auto* last_id = last_transfer_ids_.find(source_node_id);
-        if (last_id && *last_id == transfer_id) {
+        // Check for duplicate transfer using ftl::Map
+        auto it = last_transfer_ids_.find(source_node_id);
+        if (it != last_transfer_ids_.end() && it->second == transfer_id) {
             return std::nullopt;  // Duplicate transfer
         }
         
         // Update the transfer ID for this source node
-        last_transfer_ids_.insert(source_node_id, transfer_id);
+        last_transfer_ids_[source_node_id] = transfer_id;
         
         // Calculate payload size (total - header - CRC)
         const size_t payload_size = received_bytes - UdpFrame::kHeaderSize - UdpFrame::kTransferCrcSize;
@@ -151,10 +168,8 @@ private:
     uint16_t node_id_;
     UdpTransport& transport_;
     
-    // Use pool-based map for duplicate detection
-    // This map shares a memory pool with all other UdpSubscriber instances
-    PoolMap<uint16_t, uint64_t> last_transfer_ids_;
+    // Use ftl::Map for duplicate detection
+    ftl::Map<uint16_t, uint64_t> last_transfer_ids_;
 };
-
 
 }  // namespace cyphal
