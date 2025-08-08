@@ -28,8 +28,9 @@ int main() {
     // Initialize data frame class with the memory allocator.
     ftl::DataFrame::initialize(allocator);
     
-    // Initialize the shared pool for duplicate detection
-    cyphal::UdpSubscriberLastTransferIdAllocator::initialize(dup_allocator);
+    // Create the BumpPoolAllocator for map nodes and initialize the shared pool
+    cyphal::UdpSubscriberLastTransferIdAllocator::AllocatorType node_allocator(dup_allocator, 32);
+    cyphal::UdpSubscriberLastTransferIdAllocator::initialize(node_allocator);
 
     // Setup interface on loopback interface.
     ftl::ethernet::NativeEthernetInterface lo{Address{"127.0.0.1"}, Mask{"255.255.255.0"}};

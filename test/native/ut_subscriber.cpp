@@ -12,26 +12,34 @@ using namespace ftl::ipv4;
 
 class SubscriberTest : public ::testing::Test {
 protected:
-    static void SetUpTestSuite() {
-        // Create allocator once for all tests in this suite
-        // This memory persists for the entire test suite
+    void SetUp() override {
+        // Create a fresh allocator for each test to avoid state pollution
         buffer_ = new uint8_t[POOL_SIZE];
         allocator_ = new ftl::BumpAllocator(buffer_, POOL_SIZE);
         
-        // Initialize static pools once
+        // Create the BumpPoolAllocator for map nodes
+        node_allocator_ = new cyphal::UdpSubscriberLastTransferIdAllocator::AllocatorType(*allocator_, 32);
+        
+        // Re-initialize static pools for each test
+        // This is safe because initialize() is re-entrant
         ftl::DataFrame::initialize(*allocator_);
-        cyphal::UdpSubscriberLastTransferIdAllocator::initialize(*allocator_);
+        cyphal::UdpSubscriberLastTransferIdAllocator::initialize(*node_allocator_);
     }
     
-    static void TearDownTestSuite() {
-        // Don't delete the allocator or buffer - static objects may still need them
-        // during destruction. This is a test environment, so the memory will be
-        // freed when the process exits.
+    void TearDown() override {
+        // Clean up allocators and buffer after each test
+        delete node_allocator_;
+        delete allocator_;
+        delete[] buffer_;
+        node_allocator_ = nullptr;
+        allocator_ = nullptr;
+        buffer_ = nullptr;
     }
     
-    static constexpr size_t POOL_SIZE = 64 * 1024;  // Increased size for all tests
-    inline static uint8_t* buffer_ = nullptr;
-    inline static ftl::BumpAllocator* allocator_ = nullptr;
+    static constexpr size_t POOL_SIZE = 64 * 1024;
+    uint8_t* buffer_ = nullptr;
+    ftl::BumpAllocator* allocator_ = nullptr;
+    cyphal::UdpSubscriberLastTransferIdAllocator::AllocatorType* node_allocator_ = nullptr;
 };
 
 TEST_F(SubscriberTest, SubscriberCanBeCreated) {

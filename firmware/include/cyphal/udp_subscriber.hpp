@@ -25,20 +25,18 @@ public:
     using NodeType = MapType::Node;
     using AllocatorType = ftl::BumpPoolAllocator<NodeType>;
     
-    /// Initialize the shared allocator for transfer ID tracking.
-    /// Must be called once before creating any UdpSubscriber instances.
-    /// @param allocator The bump allocator to use for memory management.
-    static void initialize(ftl::BumpAllocator& allocator) {
-        if (allocator_ == nullptr) {
-            static AllocatorType pool_allocator(allocator, 32);  // Start with space for 32 nodes
-            allocator_ = &pool_allocator;
-        }
+    /// Initialize with a reference to an allocator.
+    /// Can be called multiple times to switch to a different allocator.
+    /// @param allocator Reference to the allocator to use.
+    static void initialize(AllocatorType& allocator) {
+        allocator_ = &allocator;
     }
     
     /// Get the shared allocator instance.
-    /// @return Pointer to the shared allocator, or nullptr if not initialized.
-    static AllocatorType* get() {
-        return allocator_;
+    /// @return Reference to the shared allocator.
+    static AllocatorType& get() {
+        assert(allocator_ != nullptr && "Must call UdpSubscriberLastTransferIdAllocator::initialize() before get()");
+        return *allocator_;
     }
     
 private:
@@ -58,10 +56,8 @@ public:
         : subject_id_(subject_id)
         , node_id_(node_id)
         , transport_(transport)
-        , last_transfer_ids_(*UdpSubscriberLastTransferIdAllocator::get())
+        , last_transfer_ids_(UdpSubscriberLastTransferIdAllocator::get())
     {
-        assert(UdpSubscriberLastTransferIdAllocator::get() != nullptr && 
-               "Must call UdpSubscriberLastTransferIdAllocator::initialize() before creating instances");
         // Join the multicast group for this subject
         transport_.joinMulticastGroup(subject_id_);
     }
