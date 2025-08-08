@@ -20,24 +20,29 @@ namespace cyphal {
 /// Shared allocator for transfer ID tracking across all UdpSubscriber instances
 class UdpSubscriberLastTransferIdAllocator {
 public:
+    // Define the map type and its node type for the allocator
+    using MapType = ftl::Map<uint16_t, uint64_t>;
+    using NodeType = MapType::Node;
+    using AllocatorType = ftl::BumpPoolAllocator<NodeType>;
+    
     /// Initialize the shared allocator for transfer ID tracking.
     /// Must be called once before creating any UdpSubscriber instances.
     /// @param allocator The bump allocator to use for memory management.
     static void initialize(ftl::BumpAllocator& allocator) {
         if (allocator_ == nullptr) {
-            static ftl::BumpPoolAllocator pool_allocator(allocator);
+            static AllocatorType pool_allocator(allocator, 32);  // Start with space for 32 nodes
             allocator_ = &pool_allocator;
         }
     }
     
     /// Get the shared allocator instance.
     /// @return Pointer to the shared allocator, or nullptr if not initialized.
-    static ftl::BumpPoolAllocator* get() {
+    static AllocatorType* get() {
         return allocator_;
     }
     
 private:
-    inline static ftl::BumpPoolAllocator* allocator_ = nullptr;
+    inline static AllocatorType* allocator_ = nullptr;
 };
 
 template <typename MessageT>
