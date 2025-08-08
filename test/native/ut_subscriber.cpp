@@ -12,23 +12,26 @@ using namespace ftl::ipv4;
 
 class SubscriberTest : public ::testing::Test {
 protected:
-    void SetUp() override {
-        // Create allocator for data frames and duplicate detection
+    static void SetUpTestSuite() {
+        // Create allocator once for all tests in this suite
+        // This memory persists for the entire test suite
         buffer_ = new uint8_t[POOL_SIZE];
-        allocator_ = std::make_unique<ftl::BumpAllocator>(buffer_, POOL_SIZE);
-        ftl::DataFrame::initialize(*allocator_);
+        allocator_ = new ftl::BumpAllocator(buffer_, POOL_SIZE);
         
-        // Initialize subscriber's transfer ID allocator with the same allocator
+        // Initialize static pools once
+        ftl::DataFrame::initialize(*allocator_);
         cyphal::UdpSubscriberLastTransferIdAllocator::initialize(*allocator_);
     }
     
-    void TearDown() override {
-        delete[] buffer_;
+    static void TearDownTestSuite() {
+        // Don't delete the allocator or buffer - static objects may still need them
+        // during destruction. This is a test environment, so the memory will be
+        // freed when the process exits.
     }
     
-    static constexpr size_t POOL_SIZE = 16 * 1024;
-    uint8_t* buffer_;
-    std::unique_ptr<ftl::BumpAllocator> allocator_;
+    static constexpr size_t POOL_SIZE = 64 * 1024;  // Increased size for all tests
+    inline static uint8_t* buffer_ = nullptr;
+    inline static ftl::BumpAllocator* allocator_ = nullptr;
 };
 
 TEST_F(SubscriberTest, SubscriberCanBeCreated) {
@@ -49,79 +52,79 @@ TEST_F(SubscriberTest, SubscriberCanBeCreated) {
     SUCCEED();
 }
 
-// TEST_F(SubscriberTest, SubscriberReceivesNothingWhenNoData) {
-//     ftl::ethernet::NativeEthernetInterface interface(
-//         Address("127.0.0.1"),
-//         Mask("255.255.255.0")
-//     );
+TEST_F(SubscriberTest, SubscriberReceivesNothingWhenNoData) {
+    ftl::ethernet::NativeEthernetInterface interface(
+        Address("127.0.0.1"),
+        Mask("255.255.255.0")
+    );
     
-//     cyphal::UdpTransport transport(interface);
+    cyphal::UdpTransport transport(interface);
     
-//     const uint16_t subject_id = uavcan::node::Heartbeat_1_0::_traits_::FixedPortId;
-//     const uint16_t node_id = 100;
+    const uint16_t subject_id = uavcan::node::Heartbeat_1_0::_traits_::FixedPortId;
+    const uint16_t node_id = 100;
     
-//     cyphal::UdpSubscriber<uavcan::node::Heartbeat_1_0> subscriber(
-//         subject_id, node_id, transport
-//     );
+    cyphal::UdpSubscriber<uavcan::node::Heartbeat_1_0> subscriber(
+        subject_id, node_id, transport
+    );
     
-//     // Should return nullopt when no data available
-//     auto msg = subscriber.receive();
-//     EXPECT_FALSE(msg.has_value());
-// }
+    // Should return nullopt when no data available
+    auto msg = subscriber.receive();
+    EXPECT_FALSE(msg.has_value());
+}
 
-// TEST_F(SubscriberTest, PublishAndSubscribe) {
-//     // Create two interfaces - one for publisher, one for subscriber
-//     ftl::ethernet::NativeEthernetInterface pub_interface(
-//         Address("127.0.0.1"),
-//         Mask("255.255.255.0")
-//     );
+TEST_F(SubscriberTest, PublishAndSubscribe) {
+    // Create two interfaces - one for publisher, one for subscriber
+    ftl::ethernet::NativeEthernetInterface pub_interface(
+        Address("127.0.0.1"),
+        Mask("255.255.255.0")
+    );
     
-//     ftl::ethernet::NativeEthernetInterface sub_interface(
-//         Address("127.0.0.1"), 
-//         Mask("255.255.255.0")
-//     );
+    ftl::ethernet::NativeEthernetInterface sub_interface(
+        Address("127.0.0.1"), 
+        Mask("255.255.255.0")
+    );
     
-//     // Create transports
-//     cyphal::UdpTransport pub_transport(pub_interface);
-//     cyphal::UdpTransport sub_transport(sub_interface);
+    // Create transports
+    cyphal::UdpTransport pub_transport(pub_interface);
+    cyphal::UdpTransport sub_transport(sub_interface);
     
-//     const uint16_t subject_id = uavcan::node::Heartbeat_1_0::_traits_::FixedPortId;
-//     const uint16_t pub_node_id = 42;
-//     const uint16_t sub_node_id = 100;
+    const uint16_t subject_id = uavcan::node::Heartbeat_1_0::_traits_::FixedPortId;
+    const uint16_t pub_node_id = 42;
+    const uint16_t sub_node_id = 100;
     
-//     // Create subscriber first (to join multicast group)
-//     cyphal::UdpSubscriber<uavcan::node::Heartbeat_1_0> subscriber(
-//         subject_id, sub_node_id, sub_transport
-//     );
+    // Create subscriber first (to join multicast group)
+    cyphal::UdpSubscriber<uavcan::node::Heartbeat_1_0> subscriber(
+        subject_id, sub_node_id, sub_transport
+    );
     
-//     // Create publisher
-//     cyphal::UdpPublisher<uavcan::node::Heartbeat_1_0> publisher(
-//         subject_id, pub_node_id, pub_transport, 4
-//     );
+    // Create publisher
+    cyphal::UdpPublisher<uavcan::node::Heartbeat_1_0> publisher(
+        subject_id, pub_node_id, pub_transport, 4
+    );
     
-//     // Create and publish a heartbeat message
-//     uavcan::node::Heartbeat_1_0 sent_heartbeat;
-//     sent_heartbeat.uptime = 12345;
-//     sent_heartbeat.health.value = uavcan::node::Health_1_0::ADVISORY;
-//     sent_heartbeat.mode.value = uavcan::node::Mode_1_0::MAINTENANCE;
-//     sent_heartbeat.vendor_specific_status_code = 0xAB;
+    // Create and publish a heartbeat message
+    uavcan::node::Heartbeat_1_0 sent_heartbeat;
+    sent_heartbeat.uptime = 12345;
+    sent_heartbeat.health.value = uavcan::node::Health_1_0::ADVISORY;
+    sent_heartbeat.mode.value = uavcan::node::Mode_1_0::MAINTENANCE;
+    sent_heartbeat.vendor_specific_status_code = 0xAB;
     
-//     publisher.publish(sent_heartbeat);
+    publisher.publish(sent_heartbeat);
     
-//     // Give time for loopback delivery
-//     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // Give time for loopback delivery
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     
-//     // Receive the message
-//     auto received = subscriber.receive();
+    // Receive the message
+    auto received = subscriber.receive();
     
-//     ASSERT_TRUE(received.has_value());
+    ASSERT_TRUE(received.has_value());
     
-//     // Verify the received message matches what was sent
-//     EXPECT_EQ(received->uptime, sent_heartbeat.uptime);
-//     EXPECT_EQ(received->health.value, sent_heartbeat.health.value);
-//     EXPECT_EQ(received->mode.value, sent_heartbeat.mode.value);
-//     EXPECT_EQ(received->vendor_specific_status_code, sent_heartbeat.vendor_specific_status_code);
-// }
+    // Verify the received message matches what was sent
+    EXPECT_EQ(received->uptime, sent_heartbeat.uptime);
+    EXPECT_EQ(received->health.value, sent_heartbeat.health.value);
+    EXPECT_EQ(received->mode.value, sent_heartbeat.mode.value);
+    EXPECT_EQ(received->vendor_specific_status_code, sent_heartbeat.vendor_specific_status_code);
+}
 
 TEST_F(SubscriberTest, SubscriberIgnoresDifferentSubject) {
     ftl::ethernet::NativeEthernetInterface pub_interface(

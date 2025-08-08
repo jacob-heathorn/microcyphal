@@ -6,9 +6,14 @@ add_platform_test(ut-cyphal
   ut_udp_frame.cpp
   ut_serialization.cpp
   ut_publisher.cpp
-  ut_subscriber.cpp
 )
 target_link_libraries(ut-cyphal microcyphal)
+
+add_platform_test(ut-subscriber
+  ut_subscriber.cpp
+)
+target_link_libraries(ut-subscriber microcyphal)
+
 
 # Manual tests
 add_executable(hello-publisher hello_publisher.cpp)
