@@ -17,21 +17,21 @@ protected:
         buffer_ = new uint8_t[POOL_SIZE];
         allocator_ = new ftl::BumpAllocator(buffer_, POOL_SIZE);
         
-        // Create the BumpPoolAllocator for map nodes
-        node_allocator_ = new cyphal::UdpSubscriberLastTransferIdAllocator::AllocatorType(*allocator_, 32);
+        // Create the BumpPoolAllocationStrategy for map nodes
+        node_strategy_ = new ftl::BumpPoolAllocationStrategy<cyphal::LastTransferIdAllocationStrategy::NodeType>(*allocator_, 32);
         
         // Re-initialize static pools for each test
         // This is safe because initialize() is re-entrant
         ftl::DataFrame::initialize(*allocator_);
-        cyphal::UdpSubscriberLastTransferIdAllocator::initialize(*node_allocator_);
+        cyphal::LastTransferIdAllocationStrategy::initialize(*node_strategy_);
     }
     
     void TearDown() override {
         // Clean up allocators and buffer after each test
-        delete node_allocator_;
+        delete node_strategy_;
         delete allocator_;
         delete[] buffer_;
-        node_allocator_ = nullptr;
+        node_strategy_ = nullptr;
         allocator_ = nullptr;
         buffer_ = nullptr;
     }
@@ -39,7 +39,7 @@ protected:
     static constexpr size_t POOL_SIZE = 64 * 1024;
     uint8_t* buffer_ = nullptr;
     ftl::BumpAllocator* allocator_ = nullptr;
-    cyphal::UdpSubscriberLastTransferIdAllocator::AllocatorType* node_allocator_ = nullptr;
+    ftl::BumpPoolAllocationStrategy<cyphal::LastTransferIdAllocationStrategy::NodeType>* node_strategy_ = nullptr;
 };
 
 TEST_F(SubscriberTest, SubscriberCanBeCreated) {

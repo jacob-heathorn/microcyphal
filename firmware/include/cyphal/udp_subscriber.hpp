@@ -12,35 +12,35 @@
 #include "etl/crc16_ccitt.h"
 #include "etl/crc32_c.h"
 #include "ftl/map.hpp"
-#include "ftl/bump_pool_allocator.hpp"
+#include "ftl/allocation_strategy.hpp"
+#include "ftl/bump_pool_allocation_strategy.hpp"
 #include "ftl/bump_allocator.hpp"
 
 namespace cyphal {
 
-/// Shared allocator for transfer ID tracking across all UdpSubscriber instances
-class UdpSubscriberLastTransferIdAllocator {
+/// Shared allocation strategy for transfer ID tracking across all UdpSubscriber instances
+class LastTransferIdAllocationStrategy {
 public:
-    // Define the map type and its node type for the allocator
+    // Define the map type and its node type
     using MapType = ftl::Map<uint16_t, uint64_t>;
     using NodeType = MapType::Node;
-    using AllocatorType = ftl::BumpPoolAllocator<NodeType>;
     
-    /// Initialize with a reference to an allocator.
-    /// Can be called multiple times to switch to a different allocator.
-    /// @param allocator Reference to the allocator to use.
-    static void initialize(AllocatorType& allocator) {
-        allocator_ = &allocator;
+    /// Initialize with a reference to an allocation strategy.
+    /// Can be called multiple times to switch to a different strategy.
+    /// @param strategy Reference to the allocation strategy to use.
+    static void initialize(ftl::AllocationStrategy<NodeType>& strategy) {
+        strategy_ = &strategy;
     }
     
-    /// Get the shared allocator instance.
-    /// @return Reference to the shared allocator.
-    static AllocatorType& get() {
-        assert(allocator_ != nullptr && "Must call UdpSubscriberLastTransferIdAllocator::initialize() before get()");
-        return *allocator_;
+    /// Get the shared allocation strategy instance.
+    /// @return Reference to the shared allocation strategy.
+    static ftl::AllocationStrategy<NodeType>& get() {
+        assert(strategy_ != nullptr && "Must call LastTransferIdAllocationStrategy::initialize() before get()");
+        return *strategy_;
     }
     
 private:
-    inline static AllocatorType* allocator_ = nullptr;
+    inline static ftl::AllocationStrategy<NodeType>* strategy_ = nullptr;
 };
 
 template <typename MessageT>
@@ -56,7 +56,7 @@ public:
         : subject_id_(subject_id)
         , node_id_(node_id)
         , transport_(transport)
-        , last_transfer_ids_(UdpSubscriberLastTransferIdAllocator::get())
+        , last_transfer_ids_(LastTransferIdAllocationStrategy::get())
     {
         // Join the multicast group for this subject
         transport_.joinMulticastGroup(subject_id_);
