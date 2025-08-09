@@ -68,9 +68,13 @@ export UAVCAN__NODE__ID=42
 # Monitor all Cyphal/UDP traffic
 yakut mon
 
-cmake --workflow --preset cm4-debug && cmake --workflow --preset cm7-debug && \
-rip -d0 cm7-debug:hello-cyphal && \
-rip -f0 cm7-debug:hello-cyphal -s
+# Run publisher
+cmake --workflow --preset native-debug && \
+rip -r native-debug:hello-publisher
+
+# Run subscriber
+cmake --workflow --preset native-debug && \
+rip -r native-debug:hello-subscriber
 
 # Or subscribe specifically to heartbeat messages
 export UAVCAN__UDP__IFACE=192.2.2.100

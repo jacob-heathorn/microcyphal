@@ -33,7 +33,7 @@ int main() {
     cyphal::LastTransferIdAllocationStrategy::initialize(node_strategy);
 
     // Setup interface on loopback interface.
-    ftl::ethernet::NativeEthernetInterface lo{Address{"127.0.0.1"}, Mask{"255.255.255.0"}};
+    ftl::ethernet::NativeEthernetInterface lo{Address{"192.2.2.100"}, Mask{"255.255.255.0"}};
     
     // Create transport which handles socket creation and binding.
     cyphal::UdpTransport transport(lo);
