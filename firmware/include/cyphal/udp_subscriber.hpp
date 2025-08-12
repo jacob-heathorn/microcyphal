@@ -12,35 +12,33 @@
 #include "etl/crc16_ccitt.h"
 #include "etl/crc32_c.h"
 #include "ftl/map.hpp"
-#include "ftl/allocation_strategy.hpp"
-#include "ftl/bump_pool_allocation_strategy.hpp"
-#include "ftl/bump_allocator.hpp"
+#include "ftl/allocator/strategy.hpp"
 
 namespace cyphal {
 
-/// Shared allocation strategy for transfer ID tracking across all UdpSubscriber instances
-class LastTransferIdAllocationStrategy {
+/// Shared allocator for transfer ID tracking across all UdpSubscriber instances
+class LastTransferIdAllocator {
 public:
     // Define the map type and its node type
     using MapType = ftl::Map<uint16_t, uint64_t>;
     using NodeType = MapType::Node;
     
-    /// Initialize with a reference to an allocation strategy.
+    /// Initialize with a reference to a strategy.
     /// Can be called multiple times to switch to a different strategy.
-    /// @param strategy Reference to the allocation strategy to use.
-    static void initialize(ftl::AllocationStrategy<NodeType>& strategy) {
+    /// @param strategy Reference to the obj strategy to use.
+    static void initialize(ftl::allocator::IObjStrategy<NodeType>& strategy) {
         strategy_ = &strategy;
     }
     
-    /// Get the shared allocation strategy instance.
-    /// @return Reference to the shared allocation strategy.
-    static ftl::AllocationStrategy<NodeType>& get() {
-        assert(strategy_ != nullptr && "Must call LastTransferIdAllocationStrategy::initialize() before get()");
+    /// Get the shared strategy instance.
+    /// @return Reference to the shared strategy.
+    static ftl::allocator::IObjStrategy<NodeType>& get() {
+        assert(strategy_ != nullptr && "Must call LastTransferIdAllocator::initialize() before get()");
         return *strategy_;
     }
     
 private:
-    inline static ftl::AllocationStrategy<NodeType>* strategy_ = nullptr;
+    inline static ftl::allocator::IObjStrategy<NodeType>* strategy_ = nullptr;
 };
 
 template <typename MessageT>
@@ -56,7 +54,7 @@ public:
         : subject_id_(subject_id)
         , node_id_(node_id)
         , transport_(transport)
-        , last_transfer_ids_(LastTransferIdAllocationStrategy::get())
+        , last_transfer_ids_(LastTransferIdAllocator::get())
     {
         // Join the multicast group for this subject
         transport_.joinMulticastGroup(subject_id_);

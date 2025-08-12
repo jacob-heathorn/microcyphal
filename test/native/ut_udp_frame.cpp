@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "cyphal/udp_frame.hpp"
-#include "ftl/bump_allocator.hpp"
-#include "ftl/data_frame.hpp"
+#include "ftl/allocator/bump_allocator.hpp"
+#include "ftl/allocator/bump_pool_buffer_strategy.hpp"
 
 
 class UdpFrameTest : public ::testing::Test {
@@ -14,7 +14,9 @@ protected:
     void SetUp() override {
         buffer_    = new uint8_t[POOL_MEMORY_SIZE];
         allocator_ = new ftl::BumpAllocator(buffer_, POOL_MEMORY_SIZE);
-        ftl::DataFrame::initialize(*allocator_);
+        std::array<std::size_t, 8> buffer_sizes = {32, 64, 128, 256, 512, 1024, 2048, 4096};
+        static ftl::allocator::BumpPoolBufferStrategy<8> buffer_strategy(*allocator_, buffer_sizes);
+        ftl::ipv4::udp::Payload::initialize(buffer_strategy);
     }
 
     void TearDown() override {
