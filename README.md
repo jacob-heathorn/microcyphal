@@ -60,7 +60,7 @@ export UAVCAN__UDP__IFACE="192.2.2.2"
 export UAVCAN__NODE__ID=42
 ```
 
-# Run hello-world with yakut and wireshark
+# Cyphal pub/sub
 
 ```bash
 # See previous section for setup.
