@@ -7,8 +7,7 @@
 #include "cyphal/udp_transport.hpp"
 #include "ftl/native_udp_socket.hpp"
 #include "ftl/native_ethernet_interface.hpp"
-#include "ftl/allocator/bump_allocator.hpp"
-#include "ftl/allocator/bump_pool_buffer_strategy.hpp"
+#include "ftl/allocator/malloc_buffer_strategy.hpp"
 #include "ftl/allocator/buffer_allocator.hpp"
 
 #include "uavcan/node/Heartbeat_1_0.hpp"
@@ -19,15 +18,9 @@ int main() {
     std::cout << "Cyphal/UDP Publisher Demo\n";
     std::cout << "==========================\n\n";
 
-    // Create an allocator for the data frame
-    static constexpr size_t POOL_MEMORY_SIZE = 16 * 1024;
-    uint8_t* buffer = new uint8_t[POOL_MEMORY_SIZE];
-    ftl::BumpAllocator allocator(buffer, POOL_MEMORY_SIZE);
-
     // Initialize Payload class with buffer strategy.
-    ftl::allocator::BumpPoolBufferStrategy buffer_strategy(allocator, 1500);  // Max MTU size
-    std::array<ftl::allocator::IBufferStrategy*, 1> strategies = {&buffer_strategy};
-    ftl::allocator::BufferAllocator buffer_allocator(strategies);
+    ftl::allocator::MallocBufferStrategy buffer_strategy(1500);  // Max MTU size
+    ftl::allocator::BufferAllocator buffer_allocator(buffer_strategy);
     ftl::ipv4::udp::Payload::initialize(buffer_allocator);
 
     // Setup interface on loopback interface.
@@ -94,6 +87,5 @@ int main() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    delete[] buffer;
     return 0;
 }

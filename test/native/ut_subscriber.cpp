@@ -5,10 +5,9 @@
 #include <uavcan/node/Heartbeat_1_0.hpp>
 #include <ftl/native_udp_socket.hpp>
 #include <ftl/native_ethernet_interface.hpp>
-#include <ftl/allocator/bump_allocator.hpp>
-#include <ftl/allocator/bump_pool_buffer_strategy.hpp>
+#include <ftl/allocator/malloc_buffer_strategy.hpp>
 #include <ftl/allocator/buffer_allocator.hpp>
-#include <ftl/allocator/bump_pool_strategy.hpp>
+#include <ftl/allocator/malloc_strategy.hpp>
 #include <thread>
 #include <chrono>
 
@@ -17,18 +16,13 @@ using namespace ftl::ipv4;
 class SubscriberTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        // Create a fresh allocator for each test to avoid state pollution
-        buffer_ = new uint8_t[POOL_SIZE];
-        allocator_ = new ftl::BumpAllocator(buffer_, POOL_SIZE);
-        
         // Initialize Payload with buffer strategy
-        buffer_strategy_ = new ftl::allocator::BumpPoolBufferStrategy(*allocator_, 1500);  // Max MTU size
-        std::array<ftl::allocator::IBufferStrategy*, 1> strategies = {buffer_strategy_};
-        buffer_allocator_ = new ftl::allocator::BufferAllocator(strategies);
+        buffer_strategy_ = new ftl::allocator::MallocBufferStrategy(1500);  // Max MTU size
+        buffer_allocator_ = new ftl::allocator::BufferAllocator(*buffer_strategy_);
         ftl::ipv4::udp::Payload::initialize(*buffer_allocator_);
         
-        // Create the BumpPoolObjStrategy for map nodes
-        node_strategy_ = new ftl::allocator::BumpPoolObjStrategy<cyphal::LastTransferIdAllocator::NodeType>(*allocator_);
+        // Create the MallocObjStrategy for map nodes
+        node_strategy_ = new ftl::allocator::MallocObjStrategy<cyphal::LastTransferIdAllocator::NodeType>();
         
         // Re-initialize static pools for each test
         // This is safe because initialize() is re-entrant
@@ -36,25 +30,18 @@ protected:
     }
     
     void TearDown() override {
-        // Clean up allocators and buffer after each test
+        // Clean up allocators after each test
         delete node_strategy_;
         delete buffer_allocator_;
         delete buffer_strategy_;
-        delete allocator_;
-        delete[] buffer_;
         node_strategy_ = nullptr;
         buffer_allocator_ = nullptr;
         buffer_strategy_ = nullptr;
-        allocator_ = nullptr;
-        buffer_ = nullptr;
     }
     
-    static constexpr size_t POOL_SIZE = 64 * 1024;
-    uint8_t* buffer_ = nullptr;
-    ftl::BumpAllocator* allocator_ = nullptr;
-    ftl::allocator::BumpPoolBufferStrategy* buffer_strategy_ = nullptr;
+    ftl::allocator::MallocBufferStrategy* buffer_strategy_ = nullptr;
     ftl::allocator::BufferAllocator* buffer_allocator_ = nullptr;
-    ftl::allocator::BumpPoolObjStrategy<cyphal::LastTransferIdAllocator::NodeType>* node_strategy_ = nullptr;
+    ftl::allocator::MallocObjStrategy<cyphal::LastTransferIdAllocator::NodeType>* node_strategy_ = nullptr;
 };
 
 TEST_F(SubscriberTest, SubscriberCanBeCreated) {

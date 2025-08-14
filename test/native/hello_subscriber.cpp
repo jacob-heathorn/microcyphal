@@ -8,10 +8,9 @@
 #include "cyphal/udp_transport.hpp"
 #include "ftl/native_udp_socket.hpp"
 #include "ftl/native_ethernet_interface.hpp"
-#include "ftl/allocator/bump_allocator.hpp"
-#include "ftl/allocator/bump_pool_buffer_strategy.hpp"
+#include "ftl/allocator/malloc_buffer_strategy.hpp"
 #include "ftl/allocator/buffer_allocator.hpp"
-#include "ftl/allocator/bump_pool_strategy.hpp"
+#include "ftl/allocator/malloc_strategy.hpp"
 
 #include "uavcan/node/Heartbeat_1_0.hpp"
 
@@ -21,22 +20,13 @@ int main() {
     std::cout << "Cyphal/UDP Subscriber Demo\n";
     std::cout << "===========================\n\n";
 
-    // Create allocators for data frames and duplicate detection
-    static constexpr size_t POOL_MEMORY_SIZE = 16 * 1024;
-    static constexpr size_t DUP_DETECTION_SIZE = 4 * 1024;  // For duplicate detection map nodes
-    uint8_t* buffer = new uint8_t[POOL_MEMORY_SIZE];
-    uint8_t* dup_buffer = new uint8_t[DUP_DETECTION_SIZE];
-    ftl::BumpAllocator allocator(buffer, POOL_MEMORY_SIZE);
-    ftl::BumpAllocator dup_allocator(dup_buffer, DUP_DETECTION_SIZE);
-
     // Initialize Payload class with buffer strategy.
-    ftl::allocator::BumpPoolBufferStrategy buffer_strategy(allocator, 1500);  // Max MTU size
-    std::array<ftl::allocator::IBufferStrategy*, 1> strategies = {&buffer_strategy};
-    ftl::allocator::BufferAllocator buffer_allocator(strategies);
+    ftl::allocator::MallocBufferStrategy buffer_strategy(1500);  // Max MTU size
+    ftl::allocator::BufferAllocator buffer_allocator(buffer_strategy);
     ftl::ipv4::udp::Payload::initialize(buffer_allocator);
     
-    // Create the BumpPoolObjStrategy for map nodes and initialize the shared pool
-    ftl::allocator::BumpPoolObjStrategy<cyphal::LastTransferIdAllocator::NodeType> node_strategy(dup_allocator);
+    // Create the MallocObjStrategy for map nodes and initialize the shared pool
+    ftl::allocator::MallocObjStrategy<cyphal::LastTransferIdAllocator::NodeType> node_strategy;
     cyphal::LastTransferIdAllocator::initialize(node_strategy);
 
     // Setup interface to listen on the embedded network.
@@ -105,6 +95,5 @@ int main() {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
-    delete[] buffer;
     return 0;
 }

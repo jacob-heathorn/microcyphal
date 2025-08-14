@@ -1,29 +1,20 @@
 #include <gtest/gtest.h>
 
 #include "cyphal/udp_frame.hpp"
-#include "ftl/allocator/bump_allocator.hpp"
-#include "ftl/allocator/bump_pool_buffer_strategy.hpp"
+#include "ftl/allocator/malloc_buffer_strategy.hpp"
 #include "ftl/allocator/buffer_allocator.hpp"
 
 
 class UdpFrameTest : public ::testing::Test {
 protected:
-    static constexpr size_t POOL_MEMORY_SIZE = 16 * 1024;
-    uint8_t*           buffer_;
-    ftl::BumpAllocator* allocator_;
-
     void SetUp() override {
-        buffer_    = new uint8_t[POOL_MEMORY_SIZE];
-        allocator_ = new ftl::BumpAllocator(buffer_, POOL_MEMORY_SIZE);
-        static ftl::allocator::BumpPoolBufferStrategy buffer_strategy(*allocator_, 1500);  // Max MTU size
-        static std::array<ftl::allocator::IBufferStrategy*, 1> strategies = {&buffer_strategy};
-        static ftl::allocator::BufferAllocator buffer_allocator(strategies);
+        static ftl::allocator::MallocBufferStrategy buffer_strategy(1500);  // Max MTU size
+        static ftl::allocator::BufferAllocator buffer_allocator(buffer_strategy);
         ftl::ipv4::udp::Payload::initialize(buffer_allocator);
     }
 
     void TearDown() override {
-        delete allocator_;
-        delete[] buffer_;
+        // Nothing to clean up with MallocBufferStrategy
     }
 };
 
