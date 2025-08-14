@@ -63,7 +63,7 @@ int main() {
         heartbeat.uptime = uptime++;
         heartbeat.health.value = health_states[health_index];
         heartbeat.mode.value = uavcan::node::Mode_1_0::OPERATIONAL;
-        heartbeat.vendor_specific_status_code = 0x00;
+        heartbeat.vendor_specific_status_code = 0x01;
 
         // Publish
         publisher.publish(heartbeat);

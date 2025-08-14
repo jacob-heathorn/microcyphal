@@ -85,7 +85,7 @@ int main() {
                                  "SOFTWARE_UPDATE") << ")";
             
             if (msg->vendor_specific_status_code != 0) {
-                std::cout << ", vendor=0x" << std::hex << msg->vendor_specific_status_code << std::dec;
+                std::cout << ", vendor=0x" << std::hex << static_cast<unsigned int>(msg->vendor_specific_status_code) << std::dec;
             }
             
             std::cout << std::endl;
