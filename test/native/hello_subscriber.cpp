@@ -10,6 +10,7 @@
 #include "ftl/native_ethernet_interface.hpp"
 #include "ftl/allocator/bump_allocator.hpp"
 #include "ftl/allocator/bump_pool_buffer_strategy.hpp"
+#include "ftl/allocator/buffer_allocator.hpp"
 #include "ftl/allocator/bump_pool_strategy.hpp"
 
 #include "uavcan/node/Heartbeat_1_0.hpp"
@@ -29,9 +30,10 @@ int main() {
     ftl::BumpAllocator dup_allocator(dup_buffer, DUP_DETECTION_SIZE);
 
     // Initialize Payload class with buffer strategy.
-    std::array<std::size_t, 8> buffer_sizes = {32, 64, 128, 256, 512, 1024, 2048, 4096};
-    ftl::allocator::BumpPoolBufferStrategy<8> buffer_strategy(allocator, buffer_sizes);
-    ftl::ipv4::udp::Payload::initialize(buffer_strategy);
+    ftl::allocator::BumpPoolBufferStrategy buffer_strategy(allocator, 1500);  // Max MTU size
+    std::array<ftl::allocator::IBufferStrategy*, 1> strategies = {&buffer_strategy};
+    ftl::allocator::BufferAllocator buffer_allocator(strategies);
+    ftl::ipv4::udp::Payload::initialize(buffer_allocator);
     
     // Create the BumpPoolObjStrategy for map nodes and initialize the shared pool
     ftl::allocator::BumpPoolObjStrategy<cyphal::LastTransferIdAllocator::NodeType> node_strategy(dup_allocator);
