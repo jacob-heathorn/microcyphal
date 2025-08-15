@@ -7,7 +7,7 @@
 #include <ftl/native_ethernet_interface.hpp>
 #include <ftl/allocator/malloc_buffer_strategy.hpp>
 #include <ftl/allocator/buffer_allocator.hpp>
-#include <ftl/allocator/malloc_strategy.hpp>
+#include <ftl/allocator/malloc_obj_strategy.hpp>
 #include <thread>
 #include <chrono>
 
