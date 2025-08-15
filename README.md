@@ -56,7 +56,7 @@ pipx install 'yakut[transport-udp]'
 
 # Add to .bashrc
 export CYPHAL_PATH="$HOME/path/to/public_regulated_data_types:$CYPHAL_PATH"
-export UAVCAN__UDP__IFACE="192.2.2.2"
+export UAVCAN__UDP__IFACE="192.0.2.2"
 export UAVCAN__NODE__ID=42
 ```
 
@@ -77,7 +77,7 @@ cmake --workflow --preset native-debug && \
 rip -r native-debug:hello-subscriber
 
 # Or subscribe specifically to heartbeat messages
-export UAVCAN__UDP__IFACE=192.2.2.100
+export UAVCAN__UDP__IFACE=192.0.2.100
 export UAVCAN__NODE__ID=1000
 yakut sub uavcan.node.heartbeat
 ```
