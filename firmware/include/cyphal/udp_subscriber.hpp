@@ -131,6 +131,8 @@ public:
         }
         
         // Check for duplicate transfer using ftl::Map
+        //
+        // TODO: Need transfer timeout and check it->second <= transfer_id
         auto it = last_transfer_ids_.find(source_node_id);
         if (it != last_transfer_ids_.end() && it->second == transfer_id) {
             return std::nullopt;  // Duplicate transfer
