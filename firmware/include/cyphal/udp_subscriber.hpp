@@ -13,6 +13,7 @@
 #include "etl/crc32_c.h"
 #include "ftl/map.hpp"
 #include "ftl/allocator/strategy.hpp"
+#include "ftl/allocator/obj_allocator.hpp"
 
 namespace cyphal {
 
@@ -22,23 +23,24 @@ public:
     // Define the map type and its node type
     using MapType = ftl::Map<uint16_t, uint64_t>;
     using NodeType = MapType::Node;
+    using AllocatorType = ftl::allocator::ObjAllocator<NodeType>;
     
-    /// Initialize with a reference to a strategy.
-    /// Can be called multiple times to switch to a different strategy.
-    /// @param strategy Reference to the obj strategy to use.
-    static void initialize(ftl::allocator::IObjStrategy<NodeType>& strategy) {
-        strategy_ = &strategy;
+    /// Initialize with a reference to an allocator.
+    /// Can be called multiple times to switch to a different allocator.
+    /// @param allocator Reference to the obj allocator to use.
+    static void initialize(AllocatorType& allocator) {
+        allocator_ = &allocator;
     }
     
-    /// Get the shared strategy instance.
-    /// @return Reference to the shared strategy.
-    static ftl::allocator::IObjStrategy<NodeType>& get() {
-        assert(strategy_ != nullptr && "Must call LastTransferIdAllocator::initialize() before get()");
-        return *strategy_;
+    /// Get the shared allocator instance.
+    /// @return Reference to the shared allocator.
+    static AllocatorType& get() {
+        assert(allocator_ != nullptr && "Must call LastTransferIdAllocator::initialize() before get()");
+        return *allocator_;
     }
     
 private:
-    inline static ftl::allocator::IObjStrategy<NodeType>* strategy_ = nullptr;
+    inline static AllocatorType* allocator_ = nullptr;
 };
 
 template <typename MessageT>

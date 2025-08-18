@@ -21,19 +21,22 @@ protected:
         buffer_allocator_ = new ftl::allocator::BufferAllocator(*buffer_strategy_);
         ftl::ipv4::udp::Payload::initialize(*buffer_allocator_);
         
-        // Create the MallocObjStrategy for map nodes
+        // Create the MallocObjStrategy and ObjAllocator for map nodes
         node_strategy_ = new ftl::allocator::MallocObjStrategy<cyphal::LastTransferIdAllocator::NodeType>();
+        node_allocator_ = new ftl::allocator::ObjAllocator<cyphal::LastTransferIdAllocator::NodeType>(*node_strategy_);
         
         // Re-initialize static pools for each test
         // This is safe because initialize() is re-entrant
-        cyphal::LastTransferIdAllocator::initialize(*node_strategy_);
+        cyphal::LastTransferIdAllocator::initialize(*node_allocator_);
     }
     
     void TearDown() override {
         // Clean up allocators after each test
+        delete node_allocator_;
         delete node_strategy_;
         delete buffer_allocator_;
         delete buffer_strategy_;
+        node_allocator_ = nullptr;
         node_strategy_ = nullptr;
         buffer_allocator_ = nullptr;
         buffer_strategy_ = nullptr;
@@ -42,6 +45,7 @@ protected:
     ftl::allocator::MallocBufferStrategy* buffer_strategy_ = nullptr;
     ftl::allocator::BufferAllocator* buffer_allocator_ = nullptr;
     ftl::allocator::MallocObjStrategy<cyphal::LastTransferIdAllocator::NodeType>* node_strategy_ = nullptr;
+    ftl::allocator::ObjAllocator<cyphal::LastTransferIdAllocator::NodeType>* node_allocator_ = nullptr;
 };
 
 TEST_F(SubscriberTest, SubscriberCanBeCreated) {

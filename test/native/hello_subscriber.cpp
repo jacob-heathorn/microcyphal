@@ -25,9 +25,10 @@ int main() {
     ftl::allocator::BufferAllocator buffer_allocator(buffer_strategy);
     ftl::ipv4::udp::Payload::initialize(buffer_allocator);
     
-    // Create the MallocObjStrategy for map nodes and initialize the shared pool
+    // Create the MallocObjStrategy and ObjAllocator for map nodes
     ftl::allocator::MallocObjStrategy<cyphal::LastTransferIdAllocator::NodeType> node_strategy;
-    cyphal::LastTransferIdAllocator::initialize(node_strategy);
+    ftl::allocator::ObjAllocator<cyphal::LastTransferIdAllocator::NodeType> node_allocator(node_strategy);
+    cyphal::LastTransferIdAllocator::initialize(node_allocator);
 
     // Setup interface to listen on the embedded network.
     ftl::ethernet::NativeEthernetInterface lo{Address{"192.0.2.1"}, Mask{"255.255.255.0"}};
