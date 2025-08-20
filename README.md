@@ -7,6 +7,7 @@ This repository implements a lightweight Cyphal/UDP stack for embedded systems, 
 See https://github.com/jacob-heathorn/mimxrt1170evk for a demo on the NXP MIMXRT1170-EVK
 
 # Setup Instructions
+The has only been tested in Ubuntu 24.04
 
 1) Clone this repository: `git clone https://github.com/jacob-heathorn/forge.git`
 2) Install gordion: `pipx install gordion`
