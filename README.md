@@ -36,6 +36,7 @@ See https://github.com/jacob-heathorn/mimxrt1170evk for a demo on the NXP MIMXRT
 
 # Debug
 `rip -d native-debug:hello-world`
+Debug in VSCode (F5)
 
 # ctest
 ```
