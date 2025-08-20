@@ -4,6 +4,7 @@ A lightweight Cyphal/UDP stack for embedded systems.
 
 This repository implements a lightweight Cyphal/UDP stack for embedded systems, following the [Cyphal Specification](https://opencyphal.org/specification). Cyphal is an open communication protocol designed for aerospace and robotic applications.
 
+See https://github.com/jacob-heathorn/mimxrt1170evk for a demo on the mimxrt1170evk
 
 # Setup Instructions
 
