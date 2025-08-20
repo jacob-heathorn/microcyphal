@@ -42,6 +42,10 @@ public:
     ftl::ipv4::udp::SocketPtr& getSocket() {
         return socket_;
     }
+    
+    ftl::ipv4::udp::Payload receive(ftl::ipv4::Endpoint* sender = nullptr) {
+        return socket_->receive(sender);
+    }
 
 private:
     ftl::ethernet::Interface& interface_;

@@ -4,8 +4,8 @@
 #include <uavcan/node/Heartbeat_1_0.hpp>
 #include <ftl/native_udp_socket.hpp>
 #include <ftl/native_ethernet_interface.hpp>
-#include <ftl/bump_allocator.hpp>
-#include <ftl/data_frame.hpp>
+#include <ftl/allocator/malloc_buffer_strategy.hpp>
+#include <ftl/allocator/buffer_allocator.hpp>
 #include <cyphal/udp_frame.hpp>
 #include <array>
 #include <thread>
@@ -41,19 +41,14 @@
 
 class PublisherTest : public ::testing::Test {
 protected:
-    static constexpr size_t POOL_MEMORY_SIZE = 16 * 1024;
-    uint8_t* buffer_;
-    ftl::BumpAllocator* allocator_;
-
     void SetUp() override {
-        buffer_ = new uint8_t[POOL_MEMORY_SIZE];
-        allocator_ = new ftl::BumpAllocator(buffer_, POOL_MEMORY_SIZE);
-        ftl::DataFrame::initialize(*allocator_);
+        static ftl::allocator::MallocBufferStrategy buffer_strategy(1500);  // Max MTU size
+        static ftl::allocator::BufferAllocator buffer_allocator(buffer_strategy);
+        ftl::ipv4::udp::Payload::initialize(buffer_allocator);
     }
 
     void TearDown() override {
-        delete allocator_;
-        delete[] buffer_;
+        // Nothing to clean up with MallocBufferStrategy
     }
 };
 

@@ -3,3 +3,4 @@
 /.pycache
 /scripts/package/.venv
 /.nox
+/.vscode/launch.json

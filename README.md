@@ -4,8 +4,10 @@ A lightweight Cyphal/UDP stack for embedded systems.
 
 This repository implements a lightweight Cyphal/UDP stack for embedded systems, following the [Cyphal Specification](https://opencyphal.org/specification). Cyphal is an open communication protocol designed for aerospace and robotic applications.
 
+See https://github.com/jacob-heathorn/mimxrt1170evk for a demo on the NXP MIMXRT1170-EVK
 
 # Setup Instructions
+The has only been tested in Ubuntu 24.04
 
 1) Clone this repository: `git clone https://github.com/jacob-heathorn/forge.git`
 2) Install gordion: `pipx install gordion`
@@ -35,6 +37,7 @@ This repository implements a lightweight Cyphal/UDP stack for embedded systems, 
 
 # Debug
 `rip -d native-debug:hello-world`
+Debug in VSCode (F5)
 
 # ctest
 ```
@@ -56,11 +59,11 @@ pipx install 'yakut[transport-udp]'
 
 # Add to .bashrc
 export CYPHAL_PATH="$HOME/path/to/public_regulated_data_types:$CYPHAL_PATH"
-export UAVCAN__UDP__IFACE="192.2.2.2"
+export UAVCAN__UDP__IFACE="192.0.2.2"
 export UAVCAN__NODE__ID=42
 ```
 
-# Run hello-world with yakut and wireshark
+# Cyphal pub/sub
 
 ```bash
 # See previous section for setup.
@@ -68,12 +71,16 @@ export UAVCAN__NODE__ID=42
 # Monitor all Cyphal/UDP traffic
 yakut mon
 
-cmake --workflow --preset cm4-debug && cmake --workflow --preset cm7-debug && \
-rip -d0 cm7-debug:hello-cyphal && \
-rip -f0 cm7-debug:hello-cyphal -s
+# Run publisher
+cmake --workflow --preset native-debug && \
+rip -r native-debug:hello-publisher
+
+# Run subscriber
+cmake --workflow --preset native-debug && \
+rip -r native-debug:hello-subscriber
 
 # Or subscribe specifically to heartbeat messages
-export UAVCAN__UDP__IFACE=192.2.2.100
+export UAVCAN__UDP__IFACE=192.0.2.100
 export UAVCAN__NODE__ID=1000
 yakut sub uavcan.node.heartbeat
 ```
@@ -99,3 +106,10 @@ This project follows the [Google C++ Style Guide](https://google.github.io/style
 - [Cyphal Specification](https://opencyphal.org/specification) - The official protocol specification this implementation follows
 - [OpenCyphal Forum](https://forum.opencyphal.org/) - Community discussions and support
 - [DSDL Reference](https://github.com/OpenCyphal/public_regulated_data_types) - Standard data type definitions
+
+# Copyright & Licensing
+
+Copyright (c) 2025 Jacob Heathorn
+
+This project is released under the **Academic Use License** (see [LICENSE](./LICENSE)).
+For **commercial licensing**, please contact: <jacob.heathorn@gmail.com>.
