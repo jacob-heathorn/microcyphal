@@ -1,6 +1,6 @@
 repositories:
   forge:
-    tag: cd0b81f9a5dfcd257265b75f864dca2743d9d135
+    tag: f0452aa9265940591049b6b06ed05c036d2f10ed
     url: https://github.com/jacob-heathorn/forge.git
   nunavut:
     tag: 3.0.0.dev1
