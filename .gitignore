@@ -1,6 +1,7 @@
-/.bin
-/.direnv
+/.bazel/
+/.direnv/
 /.pycache
-/scripts/package/.venv
-/.nox
+/.claude
 /.vscode/launch.json
+/MODULE.bazel.lock
+/user.bazelrc

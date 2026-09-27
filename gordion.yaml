@@ -1,13 +1,4 @@
 repositories:
   forge:
-    tag: e04701e881de11ac43dd50753764d58883597975
+    tag: 7ed68c036ff151669fe3d2af59265afe5204bd44
     url: https://github.com/jacob-heathorn/forge.git
-  nunavut:
-    tag: 3.0.0.dev1
-    url: https://github.com/OpenCyphal/nunavut.git
-  public_regulated_data_types:
-    tag: f9f67906cc0ca5d7c1b429924852f6b28f313cbf
-    url: https://github.com/OpenCyphal/public_regulated_data_types.git
-  pydsdl:
-    tag: 1.22.2
-    url: https://github.com/OpenCyphal/pydsdl.git

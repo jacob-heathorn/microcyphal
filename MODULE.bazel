@@ -1,0 +1,40 @@
+module(
+    name = "microcyphal",
+    version = "0.1.0",
+)
+
+bazel_dep(name = "rules_cc", version = "0.2.17")
+bazel_dep(name = "rules_python", version = "1.7.0")
+bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
+bazel_dep(name = "forge", version = "0.1.0")
+
+# Gordion checkouts in the workspace take precedence via tools/bazel; see gordion's README.
+git_override(
+    module_name = "forge",
+    commit = "7ed68c036ff151669fe3d2af59265afe5204bd44",
+    remote = "https://github.com/jacob-heathorn/forge.git",
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "public_regulated_data_types",
+    build_file = "//third_party:public_regulated_data_types.BUILD",
+    sha256 = "3c49db58679afc29d45625919a4eaaa056fd768ce447c9e61fa92ede565ffbcb",
+    strip_prefix = "public_regulated_data_types-f9f67906cc0ca5d7c1b429924852f6b28f313cbf",
+    urls = ["https://github.com/OpenCyphal/public_regulated_data_types/archive/f9f67906cc0ca5d7c1b429924852f6b28f313cbf.tar.gz"],
+)
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    is_default = True,
+    python_version = "3.12",
+)
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "microcyphal_pip",
+    python_version = "3.12",
+    requirements_lock = "//bazel:requirements.txt",
+)
+use_repo(pip, "microcyphal_pip")

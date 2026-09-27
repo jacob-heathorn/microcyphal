@@ -1,0 +1,41 @@
+load("@forge//bazel:copts.bzl", "FORGE_COPTS", "FORGE_CXXOPTS")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+
+cc_test(
+    name = "ut-simple",
+    srcs = ["ut_simple.cpp"],
+    copts = FORGE_COPTS + FORGE_CXXOPTS,
+    deps = ["@googletest//:gtest_main"],
+)
+
+cc_test(
+    name = "ut-cyphal",
+    srcs = [
+        "ut_publisher.cpp",
+        "ut_serialization.cpp",
+        "ut_subscriber.cpp",
+        "ut_udp_frame.cpp",
+    ],
+    copts = FORGE_COPTS + FORGE_CXXOPTS,
+    deps = [
+        "//firmware:microcyphal",
+        "@forge//firmware/native:ftl-native",
+        "@googletest//:gtest_main",
+    ],
+)
+
+[
+    cc_binary(
+        name = name,
+        srcs = [name.replace("-", "_") + ".cpp"],
+        copts = FORGE_COPTS + FORGE_CXXOPTS,
+        deps = [
+            "//firmware:microcyphal",
+            "@forge//firmware/native:ftl-native",
+        ],
+    )
+    for name in [
+        "hello-publisher",
+        "hello-subscriber",
+    ]
+]

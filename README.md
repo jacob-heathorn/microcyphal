@@ -7,43 +7,30 @@ This repository implements a lightweight Cyphal/UDP stack for embedded systems, 
 See https://github.com/jacob-heathorn/mimxrt1170evk for a demo on the NXP MIMXRT1170-EVK
 
 # Setup Instructions
-The has only been tested in Ubuntu 24.04
+This has only been tested in Ubuntu 24.04.
 
-1) Clone this repository: `git clone https://github.com/jacob-heathorn/forge.git`
-2) Install gordion: `pipx install gordion`
-3) Update the gordion dependencies: `gor -u`
-4) Install direnv:
-  * `sudo apt install direnv`
-  * Add the following to your .bashrc: `eval "$(direnv hook bash)"`
-  * Open a new terminal and change directory to here.
-  * `direnv allow .`
-5) Install nix:
-  * `sh <(curl -L https://nixos.org/nix/install) --daemon`
-6) Install the workspace recommended VSCode extensions.
-7) Create the dev environment: `nox -s dev`
+1) Clone this repository: `git clone https://github.com/jacob-heathorn/microcyphal.git`
+2) Install bazelisk: `npm i -g @bazel/bazelisk` (or `apt install bazelisk`).
+   It fetches the bazel version pinned in `.bazelversion`.
+3) Install gordion: `pipx install gordion`
+4) Materialize the gordion dependencies: `gor -u`
 
-# Repository tests
-`nox`
-
-# Clean
-`rip -c`
+# Test
+`bazel test //...`
 
 # Build
-`cmake --workflow --preset native-debug`
-`cmake --workflow --preset native-release`
+`bazel build //...`
 
-# Run
-`rip -r native-debug:hello-world`
+# DSDL types
+`//firmware:uavcan` generates C++ types for the `uavcan` namespace of the pinned
+`public_regulated_data_types` with nunavut, as a build action. Add another
+namespace with `dsdl_cc_library` from `bazel/dsdl.bzl`.
 
-# Debug
-`rip -d native-debug:hello-world`
-Debug in VSCode (F5)
-
-# ctest
-```
-cd /.bin/native-release/
-ctest
-```
+# Dependencies
+forge is managed by gordion and pinned in `gordion.yaml`; `tools/bazel` points
+bazel at a workspace checkout when there is one, and bazel fetches the
+`git_override` pin in `MODULE.bazel` otherwise. nunavut and pydsdl come from
+PyPI via `bazel/requirements.txt`.
 
 # Setup cyphal tools and wireshark
 ```bash
@@ -72,12 +59,10 @@ export UAVCAN__NODE__ID=42
 yakut mon
 
 # Run publisher
-cmake --workflow --preset native-debug && \
-rip -r native-debug:hello-publisher
+bazel run //test/native:hello-publisher
 
 # Run subscriber
-cmake --workflow --preset native-debug && \
-rip -r native-debug:hello-subscriber
+bazel run //test/native:hello-subscriber
 
 # Or subscribe specifically to heartbeat messages
 export UAVCAN__UDP__IFACE=192.0.2.100

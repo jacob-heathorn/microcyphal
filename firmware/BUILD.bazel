@@ -1,0 +1,20 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//bazel:dsdl.bzl", "dsdl_cc_library")
+
+dsdl_cc_library(
+    name = "uavcan",
+    namespace = "@public_regulated_data_types//:uavcan",
+    root = "uavcan",
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "microcyphal",
+    hdrs = glob(["include/cyphal/*.hpp"]),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":uavcan",
+        "@forge//firmware/ftl",
+    ],
+)
