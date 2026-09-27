@@ -11,7 +11,7 @@ bazel_dep(name = "forge", version = "0.1.0")
 # Gordion checkouts in the workspace take precedence via tools/bazel; see gordion's README.
 git_override(
     module_name = "forge",
-    commit = "db4d0697b834e9ccfc0dea6b0838388e83c1fcab",
+    commit = "d5266fac79e1efe1cf9b21e211e02e0ebd12d328",
     remote = "https://github.com/jacob-heathorn/forge.git",
 )
 
@@ -19,7 +19,7 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 
 http_archive(
     name = "public_regulated_data_types",
-    build_file = "//third_party:public_regulated_data_types.BUILD",
+    build_file = "//3p:public_regulated_data_types.BUILD",
     sha256 = "3c49db58679afc29d45625919a4eaaa056fd768ce447c9e61fa92ede565ffbcb",
     strip_prefix = "public_regulated_data_types-f9f67906cc0ca5d7c1b429924852f6b28f313cbf",
     urls = ["https://github.com/OpenCyphal/public_regulated_data_types/archive/f9f67906cc0ca5d7c1b429924852f6b28f313cbf.tar.gz"],
