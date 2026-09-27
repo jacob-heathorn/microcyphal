@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 # Bazelisk runs this in place of bazel: point bzlmod at the gordion checkouts in this workspace.
 set -euo pipefail
-gordion bazelrc > "$(dirname "$0")/../user.bazelrc"
+gordion bazelrc > "$(dirname "$0")/../gordion.bazelrc"
 exec "${BAZEL_REAL:?tools/bazel is run by bazelisk, not directly}" "$@"

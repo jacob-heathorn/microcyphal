@@ -27,10 +27,10 @@ This has only been tested in Ubuntu 24.04.
 namespace with `dsdl_cc_library` from `bazel/dsdl.bzl`.
 
 # Dependencies
-forge is managed by gordion and pinned in `gordion.yaml`; `tools/bazel` points
-bazel at a workspace checkout when there is one, and bazel fetches the
-`git_override` pin in `MODULE.bazel` otherwise. nunavut and pydsdl come from
-PyPI via `bazel/requirements.txt`.
+forge is managed by gordion: `gordion.yaml` pins it, `gor -u` checks it out, and `tools/bazel`
+points bazel at that checkout on every command. public_regulated_data_types is an archive bazel
+fetches itself, pinned in `MODULE.bazel`; nunavut and pydsdl come from PyPI via
+`bazel/requirements.txt`.
 
 # Setup cyphal tools and wireshark
 ```bash

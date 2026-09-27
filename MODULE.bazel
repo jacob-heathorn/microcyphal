@@ -6,14 +6,9 @@ module(
 bazel_dep(name = "rules_cc", version = "0.2.17")
 bazel_dep(name = "rules_python", version = "1.7.0")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
-bazel_dep(name = "forge", version = "0.1.0")
 
-# Gordion checkouts in the workspace take precedence via tools/bazel; see gordion's README.
-git_override(
-    module_name = "forge",
-    commit = "d5266fac79e1efe1cf9b21e211e02e0ebd12d328",
-    remote = "https://github.com/jacob-heathorn/forge.git",
-)
+# Gordion-managed: tools/bazel points bazel at gordion's checkout, and gordion.yaml holds the pin.
+bazel_dep(name = "forge")
 
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 

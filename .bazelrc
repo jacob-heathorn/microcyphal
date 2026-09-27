@@ -6,4 +6,6 @@ build --host_cxxopt=-std=c++20
 build --features=external_include_paths
 test --test_output=errors
 
+# Overrides written by tools/bazel, then any personal settings.
+try-import %workspace%/gordion.bazelrc
 try-import %workspace%/user.bazelrc
