@@ -5,10 +5,10 @@
 #include "cyphal/udp_frame.hpp"
 #include "cyphal/udp_publisher.hpp"
 #include "cyphal/udp_transport.hpp"
-#include "ftl/native_udp_socket.hpp"
-#include "ftl/native_ethernet_interface.hpp"
-#include "ftl/allocator/malloc_buffer_strategy.hpp"
-#include "ftl/allocator/buffer_allocator.hpp"
+#include "forge/native/udp_socket.hpp"
+#include "forge/native/ethernet_interface.hpp"
+#include "forge/ftl/allocator/malloc_buffer_strategy.hpp"
+#include "forge/ftl/allocator/buffer_allocator.hpp"
 
 #include "uavcan/node/Heartbeat_1_0.hpp"
 

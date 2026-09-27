@@ -1,0 +1,21 @@
+load("@forge//bazel:cc.bzl", "forge_cc_binary")
+
+# Publishes heartbeats over Cyphal/UDP from the host.
+forge_cc_binary(
+    name = "hello_publisher",
+    srcs = ["hello_publisher.cpp"],
+    deps = [
+        "//cyphal",
+        "@forge//forge/native",
+    ],
+)
+
+# Prints the heartbeats it receives.
+forge_cc_binary(
+    name = "hello_subscriber",
+    srcs = ["hello_subscriber.cpp"],
+    deps = [
+        "//cyphal",
+        "@forge//forge/native",
+    ],
+)

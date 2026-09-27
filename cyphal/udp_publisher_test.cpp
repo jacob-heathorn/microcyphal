@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <cyphal/udp_publisher.hpp>
-#include <cyphal/udp_transport.hpp>
-#include <uavcan/node/Heartbeat_1_0.hpp>
-#include <ftl/native_udp_socket.hpp>
-#include <ftl/native_ethernet_interface.hpp>
-#include <ftl/allocator/malloc_buffer_strategy.hpp>
-#include <ftl/allocator/buffer_allocator.hpp>
-#include <cyphal/udp_frame.hpp>
+#include "cyphal/udp_publisher.hpp"
+#include "cyphal/udp_transport.hpp"
+#include "uavcan/node/Heartbeat_1_0.hpp"
+#include "forge/native/udp_socket.hpp"
+#include "forge/native/ethernet_interface.hpp"
+#include "forge/ftl/allocator/malloc_buffer_strategy.hpp"
+#include "forge/ftl/allocator/buffer_allocator.hpp"
+#include "cyphal/udp_frame.hpp"
 #include <array>
 #include <thread>
 #include <chrono>
@@ -32,7 +32,7 @@
  * - Inspecting the serialized payload data
  * 
  * For manual testing with external tools:
- * 1. Run the hello-world example: `rip -r native-debug:hello-world`
+ * 1. Run the publisher: `bazel run //apps:hello_publisher`
  * 2. Monitor with yakut in another terminal:
  *    `yakut mon` or `yakut sub uavcan.node.Heartbeat.1.0`
  * 

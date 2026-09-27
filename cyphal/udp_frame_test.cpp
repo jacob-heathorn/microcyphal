@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "cyphal/udp_frame.hpp"
-#include "ftl/allocator/malloc_buffer_strategy.hpp"
-#include "ftl/allocator/buffer_allocator.hpp"
+#include "forge/ftl/allocator/malloc_buffer_strategy.hpp"
+#include "forge/ftl/allocator/buffer_allocator.hpp"
 
 
 class UdpFrameTest : public ::testing::Test {

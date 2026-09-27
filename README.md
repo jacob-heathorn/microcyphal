@@ -22,7 +22,7 @@ This has only been tested in Ubuntu 24.04.
 `bazel build //...`
 
 # DSDL types
-`//firmware:uavcan` generates C++ types for the `uavcan` namespace of the pinned
+`//cyphal:uavcan` generates C++ types for the `uavcan` namespace of the pinned
 `public_regulated_data_types` with nunavut, as a build action. Add another
 namespace with `dsdl_cc_library` from `bazel/dsdl.bzl`.
 
@@ -59,10 +59,10 @@ export UAVCAN__NODE__ID=42
 yakut mon
 
 # Run publisher
-bazel run //test/native:hello-publisher
+bazel run //apps:hello_publisher
 
 # Run subscriber
-bazel run //test/native:hello-subscriber
+bazel run //apps:hello_subscriber
 
 # Or subscribe specifically to heartbeat messages
 export UAVCAN__UDP__IFACE=192.0.2.100

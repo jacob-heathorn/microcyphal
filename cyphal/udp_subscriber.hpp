@@ -7,13 +7,13 @@
 
 #include "cyphal/udp_frame.hpp"
 #include "cyphal/udp_transport.hpp"
-#include "ftl/byte_order.hpp"
+#include "forge/ftl/byte_order.hpp"
 #include "nunavut/support/serialization.hpp"
 #include "etl/crc16_ccitt.h"
 #include "etl/crc32_c.h"
-#include "ftl/map.hpp"
-#include "ftl/allocator/strategy.hpp"
-#include "ftl/allocator/obj_allocator.hpp"
+#include "forge/ftl/map.hpp"
+#include "forge/ftl/allocator/strategy.hpp"
+#include "forge/ftl/allocator/obj_allocator.hpp"
 
 namespace cyphal {
 
