@@ -1,14 +1,14 @@
-load("@forge//bazel:copts.bzl", "FORGE_COPTS", "FORGE_CXXOPTS")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+load("@forge//bazel:cc.bzl", "forge_cc_binary", "forge_cc_test")
 
-cc_test(
+# Checks that GoogleTest itself works.
+forge_cc_test(
     name = "ut-simple",
     srcs = ["ut_simple.cpp"],
-    copts = FORGE_COPTS + FORGE_CXXOPTS,
     deps = ["@googletest//:gtest_main"],
 )
 
-cc_test(
+# The Cyphal/UDP transport, publisher and subscriber against the host network stack.
+forge_cc_test(
     name = "ut-cyphal",
     srcs = [
         "ut_publisher.cpp",
@@ -16,7 +16,6 @@ cc_test(
         "ut_subscriber.cpp",
         "ut_udp_frame.cpp",
     ],
-    copts = FORGE_COPTS + FORGE_CXXOPTS,
     deps = [
         "//firmware:microcyphal",
         "@forge//firmware/native:ftl-native",
@@ -25,10 +24,9 @@ cc_test(
 )
 
 [
-    cc_binary(
+    forge_cc_binary(
         name = name,
         srcs = [name.replace("-", "_") + ".cpp"],
-        copts = FORGE_COPTS + FORGE_CXXOPTS,
         deps = [
             "//firmware:microcyphal",
             "@forge//firmware/native:ftl-native",
