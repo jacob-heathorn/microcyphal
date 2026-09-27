@@ -4,5 +4,4 @@
 /.claude
 /.vscode/launch.json
 /MODULE.bazel.lock
-/gordion.bazelrc
 /user.bazelrc

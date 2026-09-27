@@ -7,5 +7,5 @@ build --features=external_include_paths
 test --test_output=errors
 
 # Overrides written by tools/bazel, then any personal settings.
-try-import %workspace%/gordion.bazelrc
+try-import %workspace%/.bazel/gordion.bazelrc
 try-import %workspace%/user.bazelrc
