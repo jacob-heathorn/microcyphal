@@ -1,1 +1,2 @@
-exports_files(glob(["*.BUILD"]))
+# Lets MODULE.bazel install this BUILD file into the archive it describes.
+exports_files(["public_regulated_data_types.BUILD"])

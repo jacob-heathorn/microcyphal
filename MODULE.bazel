@@ -10,6 +10,7 @@ bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
 # Gordion-managed: tools/bazel points bazel at gordion's checkout, and gordion.yaml holds the pin.
 bazel_dep(name = "forge")
 
+# Archives with no bazel support of their own; 3p/ holds the BUILD files bazel installs in them.
 http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
