@@ -30,8 +30,8 @@ int main() {
     ftl::allocator::ObjAllocator<cyphal::LastTransferIdAllocator::NodeType> node_allocator(node_strategy);
     cyphal::LastTransferIdAllocator::initialize(node_allocator);
 
-    // Setup interface to listen on the embedded network.
-    ftl::ethernet::NativeEthernetInterface lo{Address{"192.0.2.1"}, Mask{"255.255.255.0"}};
+    // The host's interface on the demo network.
+    ftl::ethernet::NativeEthernetInterface lo{Address{"192.168.144.50"}, Mask{"255.255.255.0"}};
     
     // Create transport which handles socket creation and binding.
     cyphal::UdpTransport transport(lo);
