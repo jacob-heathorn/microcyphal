@@ -26,6 +26,14 @@ bazel run //apps:hello_publisher      # send heartbeats
 bazel run //apps:hello_subscriber     # print the heartbeats received
 ```
 
+Run one in each terminal to see them talk on the host. To talk to a board instead, flash the
+opposite demo from [mimxrt1170evk](https://github.com/jacob-heathorn/mimxrt1170evk):
+
+```
+bazel run //apps:hello_subscriber     # here, while the board runs hello_publisher
+bazel run //apps:hello_publisher      # here, while the board runs hello_subscriber
+```
+
 ## Debug and release
 
 Add `-c dbg` or `-c opt` to any command for a debug or release build:
